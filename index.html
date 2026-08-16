@@ -60,6 +60,13 @@
 .kProgress{height:8px;background:#e9edf3;border-radius:99px;overflow:hidden;margin:7px 0}.kProgress i{display:block;height:100%;background:#159b63}
 .kActions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:8px}.kActions button{padding:8px 6px;font-size:11px}
 </style>
+
+<style id="v81UnitKitchen">
+.unitGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:10px 0}
+.unitChip{border:1px solid #dce2ea;background:#fff;border-radius:12px;padding:9px 6px;font-size:11px;font-weight:800;color:#56606e}
+.unitChip.unitDone{background:#e7f7ee;border-color:#bfe7cf;color:#11815a}
+@media(max-width:380px){.unitGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
 </head><body><div class="app">
 <div class="head"><div class="brand">🏖️ Thác Dê Camping</div><button class="iconbtn" onclick="openSettings()">⚙️</button></div>
 <div id="installPwaBar" style="display:none;margin:10px 0 0">
@@ -78,26 +85,23 @@
 
 <section id="preorders" class="page"><div class="titlebar"><div class="title">Đặt trước</div><button class="link" onclick="openPre()">+ Tạo đặt trước</button></div><div id="preList"></div></section>
 
-<section id="inventory" class="page"><div class="titlebar"><div class="title">Danh mục món & mua hàng thực tế</div><button class="link" onclick="openProduct()">+ Sản phẩm</button></div><div id="prodList" class="products"></div><div class="section"><div class="titlebar"><div class="title">Các khoản mua gần đây</div><button class="link" onclick="openPurchase()">+ Ghi nguyên liệu</button></div><div class="muted" style="margin:-2px 0 8px">Ghi số tiền thực tế đã mua cho khách/sạp để tính lợi nhuận và biết ai đã ứng tiền.</div><div id="purchaseList" class="box"></div></div></section>
+<section id="inventory" class="page"><div class="titlebar"><div class="title">Danh mục món & nguyên liệu</div><button class="link" onclick="openProduct()">+ Sản phẩm</button></div><div id="prodList" class="products"></div><div class="section"><div class="titlebar"><div class="title">Nguyên liệu mua gần đây</div><button class="link" onclick="openPurchase()">+ Ghi nguyên liệu</button></div><div class="muted" style="margin:-2px 0 8px">Ghi số tiền thực tế đã mua cho khách/sạp để tính lợi nhuận và biết ai đã ứng tiền.</div><div id="purchaseList" class="box"></div></div></section>
 
 
 <section id="expenses" class="page">
 <div class="titlebar"><div class="title">Chi phí & đầu tư</div><button class="link" onclick="openExpense()">+ Ghi khoản chi</button></div>
-<div class="tabs"><button class="on" onclick="expenseView='expense',kitchenFilter='active';tabExpense(this);renderExpenses()">Chi phí vận hành</button><button onclick="expenseView='investment';tabExpense(this);renderExpenses()">Đầu tư tài sản</button></div>
+<div class="tabs"><button class="on" onclick="expenseView='expense',kitchenFilter='active',kitchenStallId=null;tabExpense(this);renderExpenses()">Chi phí vận hành</button><button onclick="expenseView='investment';tabExpense(this);renderExpenses()">Đầu tư tài sản</button></div>
 <div class="kpis"><div class="kpi"><span>CHI PHÍ HÔM NAY</span><b id="eToday">0 ₫</b></div><div class="kpi"><span>ĐẦU TƯ HÔM NAY</span><b id="iToday">0 ₫</b></div></div>
 <div class="section"><div class="title">Danh sách</div><div id="expenseList" class="box"></div></div>
 </section>
 
 <section id="kitchen" class="page">
-<div class="titlebar"><div><div class="title">Bếp / Lên món</div><div class="muted">Theo dõi món chưa làm, đang làm và đã lên cho từng sạp.</div></div><button class="link" onclick="renderKitchen()">↻ Làm mới</button></div>
-<div class="tabs">
-  <button class="on" onclick="kitchenFilter='active';kitchenTab(this);renderKitchen()">Cần xử lý</button>
-  <button onclick="kitchenFilter='all';kitchenTab(this);renderKitchen()">Tất cả sạp</button>
-</div>
+<div class="titlebar"><div><div class="title">Bếp / Lên món</div><div class="muted">Chọn từng sạp để kiểm món đã lên đủ hay chưa.</div></div><button class="link" onclick="renderKitchen()">↻</button></div>
+<div id="kitchenStallTabs" class="tabs"></div>
 <div id="kitchenSummary" class="kpis"></div>
 <div id="kitchenList" class="section"></div>
 </section>
-<section id="reports" class="page"><div class="title">Báo cáo</div><div class="periods"><button class="on" onclick="reportPeriod='day';periodOn(this);renderReport()">Hôm nay</button><button onclick="reportPeriod='week';periodOn(this);renderReport()">Tuần</button><button onclick="reportPeriod='month';periodOn(this);renderReport()">Tháng</button><button onclick="reportPeriod='year';periodOn(this);renderReport()">Năm</button></div><div class="kpis"><div class="kpi"><span>DOANH THU</span><b id="rRev"></b></div><div class="kpi"><span>MUA HÀNG THỰC TẾ</span><b id="rCost"></b></div><div class="kpi"><span>CHI PHÍ VẬN HÀNH</span><b id="rExp"></b></div><div class="kpi"><span>LỢI NHUẬN VỀ TAY</span><b id="rProfit"></b></div><div class="kpi"><span>SỐ BILL</span><b id="rBills"></b></div><div class="kpi"><span>BIÊN LỢI NHUẬN VỀ TAY</span><b id="rMargin"></b></div></div>
+<section id="reports" class="page"><div class="title">Báo cáo</div><div class="periods"><button class="on" onclick="reportPeriod='day';periodOn(this);renderReport()">Hôm nay</button><button onclick="reportPeriod='week';periodOn(this);renderReport()">Tuần</button><button onclick="reportPeriod='month';periodOn(this);renderReport()">Tháng</button><button onclick="reportPeriod='year';periodOn(this);renderReport()">Năm</button></div><div class="kpis"><div class="kpi"><span>DOANH THU</span><b id="rRev"></b></div><div class="kpi"><span>NGUYÊN LIỆU / HÀNG BÁN</span><b id="rCost"></b></div><div class="kpi"><span>CHI PHÍ VẬN HÀNH</span><b id="rExp"></b></div><div class="kpi"><span>LỢI NHUẬN VỀ TAY</span><b id="rProfit"></b></div><div class="kpi"><span>SỐ BILL</span><b id="rBills"></b></div><div class="kpi"><span>BIÊN LỢI NHUẬN VỀ TAY</span><b id="rMargin"></b></div></div>
 <div class="section"><div class="titlebar"><div class="title">Biểu đồ kinh doanh</div><button class="link" onclick="openDaySettlement(dateKey())">Chốt hôm nay</button></div><div id="businessChart" class="chartCard"></div></div>
 <div class="profitHero"><div class="small" style="color:#e5fff5">LỢI NHUẬN VỀ TAY</div><div id="profitInHand" class="value">0 ₫</div><div class="small" style="color:#e5fff5">Doanh thu − mua hàng thực tế − chi phí vận hành</div></div>
 <div class="section"><div class="title">Chi tiết theo thời gian</div><div id="timeline" class="box"></div></div><div class="section"><div class="title">Tiền thu theo phương thức</div><div id="paySplit" class="box"></div></div>
@@ -114,13 +118,16 @@
 
 
 <div id="moreModal" class="modal"><div class="sheet"><h3>Thêm</h3>
-<div class="grid2"><button class="btn secondary" onclick="closeM('moreModal');show('inventory');renderInventory()">🛒 Nguyên liệu / hàng bán</button>
-<button class="btn secondary" onclick="closeM('moreModal');expenseView='expense';show('expenses');renderExpenses()">💸 Chi phí</button>
+<div class="grid2">
+<button class="btn secondary" onclick="closeM('moreModal');show('inventory');renderInventory()">🍽️ Danh mục món</button>
+<button class="btn secondary" onclick="closeM('moreModal');show('inventory');renderInventory();setTimeout(openPurchase,50)">🛒 Nguyên liệu / hàng bán</button>
+<button class="btn secondary" onclick="closeM('moreModal');expenseView='expense';show('expenses');renderExpenses()">💸 Chi phí vận hành</button>
 <button class="btn secondary" onclick="closeM('moreModal');expenseView='investment';show('expenses');renderExpenses()">🏗️ Đầu tư</button>
-<button class="btn secondary" onclick="closeM('moreModal');openRecon()">🧮 Đối soát</button>
-<button class="btn secondary" onclick="closeM('moreModal');openDebts()">👥 Người ứng vốn</button>
-<button class="btn secondary" onclick="closeM('moreModal');openSettings()">⚙️ Cài đặt & Backup</button>
-</div><button class="btn dark full" style="margin-top:10px" onclick="closeM('moreModal')">Đóng</button></div></div>
+<button class="btn secondary" onclick="closeM('moreModal');openDebts()">👥 Người ứng tiền</button>
+<button class="btn secondary" onclick="closeM('moreModal');openSettings()">💾 Dữ liệu & cài đặt</button>
+</div>
+<button class="btn dark full" style="margin-top:10px" onclick="closeM('moreModal')">Đóng</button>
+</div></div>
 
 <div id="debtsModal" class="modal"><div class="sheet"><h3>Người ứng vốn & hoàn tiền</h3>
 <div class="warn">Số dư = tiền đã ứng nhập hàng + chi hộ vận hành − tiền đã hoàn. Số dư được giữ qua các ngày.</div>
@@ -162,7 +169,19 @@
 </div>
 <button class="btn dark full" style="margin-top:10px" onclick="closeM('stallTypeModal')">Hủy</button>
 </div></div>
-<div id="stallModal" class="modal"><div class="sheet"><h3>Quản lý sạp</h3><button class="btn primary full" onclick="addStall()">+ Thêm sạp</button><div id="stallManage" class="box" style="margin-top:9px"></div><button class="btn dark full" style="margin-top:9px" onclick="closeM('stallModal')">Xong</button></div></div>
+<div id="stallModal" class="modal"><div class="sheet"><h3>Quản lý sạp</h3>
+<button class="btn primary full" onclick="toggleInlineAddStall()">+ Thêm sạp</button>
+<div id="inlineAddStall" class="box" style="display:none;margin-top:9px;padding:10px">
+  <div class="title" style="margin-bottom:8px">Chọn loại sạp</div>
+  <div class="grid2">
+    <button class="btn secondary" onclick="quickAddStall('big')">🏕️ <b>Sạp to</b><br><span id="inlineBigPrice" class="muted">300.000 ₫</span></button>
+    <button class="btn secondary" onclick="quickAddStall('small')">⛺ <b>Sạp bé</b><br><span id="inlineSmallPrice" class="muted">200.000 ₫</span></button>
+  </div>
+  <button class="btn dark full" style="margin-top:8px" onclick="toggleInlineAddStall(false)">Hủy</button>
+</div>
+<div id="stallManage" class="box" style="margin-top:9px"></div>
+<button class="btn dark full" style="margin-top:9px" onclick="closeM('stallModal')">Xong</button>
+</div></div>
 
 <div id="preModal" class="modal"><div class="sheet"><h3>Đặt trước</h3>
 <div class="form2"><input id="preCustomer" placeholder="Tên khách / đoàn"><input id="prePhone" placeholder="SĐT"><input id="preDate" type="date"><input id="preStart" type="time" value="09:00"><input id="preEnd" type="time" value="14:00"><input id="preDeposit" type="number" placeholder="Tiền cọc"><textarea id="preNote" class="wide" placeholder="Ghi chú"></textarea></div>
@@ -186,19 +205,28 @@
 <div class="warn" style="margin-top:9px">Khoản này được tính vào chi phí mua hàng thực tế. Có thể nhiều người cùng trả.</div>
 <div class="actions" style="margin-top:9px"><button class="btn secondary" onclick="closeM('purchaseModal')">Hủy</button><button class="btn primary" onclick="savePurchase()">Lưu mua hàng</button></div></div></div>
 
-<div id="expenseModal" class="modal"><div class="sheet"><h3>Ghi khoản chi</h3>
-<div class="form2">
-<select id="expenseKind" onchange="toggleExpenseKind()"><option value="expense">Chi phí vận hành</option><option value="investment">Đầu tư tài sản</option></select>
-<input id="expenseDate" type="date">
-<input id="expenseName" class="wide" placeholder="Nội dung: đá lạnh, xăng, bàn ghế...">
-<select id="expenseCategory"></select>
-<input id="expenseAmount" type="number" placeholder="Số tiền">
-<input id="expensePayer" placeholder="Người bỏ tiền">
-<textarea id="expenseNote" class="wide" placeholder="Ghi chú"></textarea>
+<div id="expenseModal" class="modal"><div class="sheet">
+<h3 id="expenseModalTitle">Ghi chi phí</h3>
+<div id="operatingExpenseForm">
+  <div class="form2"><input id="expensePayer" placeholder="Ai cầm tiền đi mua?"><input id="expenseDate" type="date"></div>
+  <div class="sectionHead">Đã mua những gì?</div>
+  <div id="expenseItems"></div>
+  <button class="btn secondary full" onclick="addExpenseItem()">+ Thêm món</button>
+  <div class="sum" style="margin-top:9px"><div class="line grand"><span>Tổng chi phí</span><span id="expenseItemsTotal">0 ₫</span></div></div>
+  <textarea id="expenseNote" style="margin-top:9px" placeholder="Ghi chú (tùy chọn)"></textarea>
 </div>
-<div class="warn" style="margin-top:9px">Chi phí vận hành được trừ khi tính lợi nhuận. Đầu tư tài sản được theo dõi riêng, không trừ thẳng vào lợi nhuận bán hàng trong ngày.</div>
-<div class="actions" style="margin-top:9px"><button class="btn secondary" onclick="closeM('expenseModal')">Hủy</button><button class="btn primary" onclick="saveExpense()">Lưu khoản chi</button></div>
+<div id="investmentForm" style="display:none">
+  <div class="form2">
+    <input id="investmentName" class="wide" placeholder="Đầu tư gì? VD xi măng, bạt, dây thừng...">
+    <input id="investmentAmount" type="number" placeholder="Số tiền">
+    <input id="investmentDate" type="date">
+    <input id="investmentPayer" class="wide" placeholder="Ai trả tiền?">
+    <textarea id="investmentNote" class="wide" placeholder="Ghi chú"></textarea>
+  </div>
+</div>
+<div class="actions" style="margin-top:9px"><button class="btn secondary" onclick="closeM('expenseModal')">Hủy</button><button class="btn primary" onclick="saveExpenseSmart()">Lưu</button></div>
 </div></div>
+
 <div id="reconModal" class="modal"><div class="sheet"><h3>Quyết toán cuối ngày</h3>
 <div class="kpis"><div class="kpi"><span>DOANH THU</span><b id="qRev"></b></div><div class="kpi"><span>LỢI NHUẬN THỰC</span><b id="qProfit"></b></div></div>
 <div class="section"><div class="title">Dòng tiền hôm nay</div><div id="cashRecon" class="box"></div></div>
@@ -238,12 +266,12 @@ if(!db.meta.brandMigratedToThacDe){
   db.meta.brandMigratedToThacDe=true;
   localStorage.setItem(KEY,JSON.stringify(db));
 }
-db.meta=db.meta||{};db.meta.version=5.7;db.meta.smallStallPrice=db.meta.smallStallPrice||200000;db.meta.largeStallPrice=db.meta.largeStallPrice||300000;
-db.stalls.forEach(s=>{s.order=s.order||{};s.order.items=s.order.items||{};if(s.rentEnabled===undefined)s.rentEnabled=true});
+db.meta=db.meta||{};db.meta.version=8;db.meta.smallStallPrice=db.meta.smallStallPrice||200000;db.meta.largeStallPrice=db.meta.largeStallPrice||300000;
+db.stalls.forEach(s=>{s.baseName=s.baseName||s.name;s.order=s.order||{};s.order.items=s.order.items||{};if(s.rentEnabled===undefined)s.rentEnabled=true});
 db.bills.forEach(b=>{b.updatedAt=b.updatedAt||new Date((b.date||dateKey())+'T'+(b.time||'00:00')).getTime()||0});
 
 // ===== V6 KITCHEN / SERVING MIGRATION =====
-db.meta=db.meta||{};db.meta.version=6;
+db.meta=db.meta||{};db.meta.version=8;
 db.stalls.forEach(s=>{
   s.order=s.order||{};s.order.items=s.order.items||{};s.order.kitchen=s.order.kitchen||{};
   Object.entries(s.order.items).forEach(([pid,q])=>{
@@ -264,25 +292,72 @@ function renderHome(){let t=stats('day');$('todayRev').textContent=money(t.rev);
 function openStall(id){currentStall=id;let s=stall(id);if(!s.order)s.order={items:{}};if(!s.order.items)s.order.items={};show('order');$('orderTitle').textContent=s.name;let st=statusInfo(s);$('orderStatus').textContent=st[0];$('orderStatus').className='tag '+st[1];$('customerOrder').value=s.order.customer||'';$('depositOrder').value=s.order.deposit||'';$('orderNote').value=s.order.note||'';$('pay').value=s.order.pay||'Tiền mặt';$('discount').value=s.order.discount||'';let rt=s.order.rentChoice||(String(s.type||'').toLowerCase().includes('to')?'large':'small');$('rentChoice').value=rt;$('rentAmount').value=s.order.rentAmount??(rt==='large'?db.meta.largeStallPrice:rt==='small'?db.meta.smallStallPrice:0);let cm=$('customerMini');cm.style.display=s.order.customer?'inline-block':'none';cm.textContent=s.order.customer||'';renderProductPicker();renderCart()}
 function renderProductPicker(){$('productPicker').innerHTML=db.products.filter(p=>filterProd==='all'||p.stock>0).map(p=>`<div class="prod"><div class="pic" ${p.image?`style="background-image:url('${p.image}');font-size:0"`:''}>${p.image?'':p.icon||'📦'}</div><div class="pbody"><div class="pname">${p.name}</div><div class="muted">${p.unit||'phần'}</div><div class="price">${money(p.price)}/${p.unit}</div><button class="btn green full" onclick="addItem('${p.id}')">+ Thêm</button></div></div>`).join('')}
 function addItem(id){
-  let s=stall(currentStall);s.order=s.order||{items:{},kitchen:{}};s.order.items=s.order.items||{};s.order.kitchen=s.order.kitchen||{};
+  let s=stall(currentStall);
+  s.order=s.order||{items:{},kitchen:{}};s.order.items=s.order.items||{};s.order.kitchen=s.order.kitchen||{};
   s.order.items[id]=(s.order.items[id]||0)+1;
-  let k=s.order.kitchen[id]||(s.order.kitchen[id]={status:'pending',served:0});
-  if(k.status==='served'&&k.served<s.order.items[id])k.status='pending';
+  let k=s.order.kitchen[id]||(s.order.kitchen[id]={status:'pending',served:0,units:[]});
+  if(!Array.isArray(k.units))k.units=[];
+  while(k.units.length<s.order.items[id])k.units.push(false);
+  getKitchenState(s,id);
   if(s.status==='empty')s.status='using';
   save();renderCart();renderKitchen();
-}function qchg(id,d){let s=stall(currentStall);s.order.items[id]=(s.order.items[id]||0)+d;if(s.order.items[id]<=0)delete s.order.items[id];save();renderCart()}
+}
+function qchg(id,d){
+  let s=stall(currentStall);s.order.kitchen=s.order.kitchen||{};
+  s.order.items[id]=(s.order.items[id]||0)+d;
+  if(s.order.items[id]<=0){
+    delete s.order.items[id];
+    delete s.order.kitchen[id];
+  }else{
+    let k=s.order.kitchen[id]||(s.order.kitchen[id]={status:'pending',served:0,units:[]});
+    if(!Array.isArray(k.units))k.units=[];
+    while(k.units.length<s.order.items[id])k.units.push(false);
+    if(k.units.length>s.order.items[id])k.units=k.units.slice(0,s.order.items[id]);
+    getKitchenState(s,id);
+  }
+  save();renderCart();renderKitchen();
+}
 function applyRentChoice(){let c=$('rentChoice').value;$('rentAmount').value=c==='large'?db.meta.largeStallPrice:c==='small'?db.meta.smallStallPrice:0;renderCart()}function renderCart(){let s=stall(currentStall),sub=0;$('cart').innerHTML=Object.keys(s.order.items).length?Object.entries(s.order.items).map(([id,q])=>{let p=prod(id);sub+=p.price*q;return `<div class="row"><div><b>${p.name}</b><div class="muted">${money(p.price)} × ${q} ${p.unit}</div></div><div class="qty"><button onclick="qchg('${id}',-1)">−</button><b>${q}</b><button onclick="qchg('${id}',1)">+</button></div></div>`}).join(''):'<div class="center muted" style="padding:18px">Chưa có món</div>';let rent=$('rentChoice').value==='none'?0:Math.max(0,+$('rentAmount').value||0),dis=Math.max(0,+$('discount').value||0),dep=Math.max(0,+$('depositOrder').value||0),due=Math.max(0,sub+rent-dis-dep);$('sub').textContent=money(sub);$('rentSum').textContent=money(rent);$('dis').textContent=money(dis);$('dep').textContent=money(dep);$('due').textContent=money(due)}
 function saveOpenOrder(){let s=stall(currentStall);s.order.kitchen=s.order.kitchen||{};s.order.customer=$('customerOrder').value.trim();s.order.deposit=+$('depositOrder').value||0;s.order.note=$('orderNote').value;s.order.pay=$('pay').value;s.order.discount=+$('discount').value||0;s.order.rentChoice=$('rentChoice').value;s.order.rentAmount=+$('rentAmount').value||0;if(s.status==='empty')s.status='using';save();show('home')}
 
 
 // ===== V7 CLEAN MIGRATION =====
-db.meta=db.meta||{};db.meta.version=7;db.meta.appName='Thác Dê Camping';
+db.meta=db.meta||{};db.meta.version=8;db.meta.appName='Thác Dê Camping';
+
+// ===== V8.1 PER-UNIT SERVING MIGRATION =====
+db.meta=db.meta||{};db.meta.version=8.1;
+db.stalls.forEach(s=>{
+  s.order=s.order||{};s.order.items=s.order.items||{};s.order.kitchen=s.order.kitchen||{};
+  Object.entries(s.order.items).forEach(([pid,q])=>{
+    const qty=Math.max(0,+q||0);
+    let k=s.order.kitchen[pid]||(s.order.kitchen[pid]={status:'pending',served:0,units:[]});
+    if(!Array.isArray(k.units))k.units=[];
+    while(k.units.length<qty)k.units.push(false);
+    if(k.units.length>qty)k.units=k.units.slice(0,qty);
+    const oldServed=Math.max(0,Math.min(qty,+k.served||0));
+    // migrate previous aggregate served count into first N checked units if units are still empty
+    if(!k.units.some(Boolean) && oldServed>0){
+      for(let i=0;i<oldServed;i++)k.units[i]=true;
+    }
+    k.served=k.units.filter(Boolean).length;
+    k.status=k.served>=qty&&qty>0?'served':k.served>0?'cooking':'pending';
+  });
+});
+
 function kitchenTab(b){document.querySelectorAll('#kitchen .tabs button').forEach(x=>x.classList.remove('on'));b.classList.add('on')}
 function getKitchenState(s,pid){
-  s.order=s.order||{};s.order.kitchen=s.order.kitchen||{};
-  let q=+(s.order.items?.[pid]||0),k=s.order.kitchen[pid]||(s.order.kitchen[pid]={status:'pending',served:0});
-  k.served=Math.max(0,Math.min(q,+k.served||0));
-  if(q>0&&k.served>=q)k.status='served';
+  s.order=s.order||{};s.order.items=s.order.items||{};s.order.kitchen=s.order.kitchen||{};
+  const q=Math.max(0,+(s.order.items?.[pid]||0));
+  let k=s.order.kitchen[pid]||(s.order.kitchen[pid]={status:'pending',served:0,units:[]});
+  if(!Array.isArray(k.units))k.units=[];
+  while(k.units.length<q)k.units.push(false);
+  if(k.units.length>q)k.units=k.units.slice(0,q);
+  if(!k.units.some(Boolean) && (+k.served||0)>0){
+    const n=Math.min(q,+k.served||0);
+    for(let i=0;i<n;i++)k.units[i]=true;
+  }
+  k.served=k.units.filter(Boolean).length;
+  k.status=k.served>=q&&q>0?'served':k.served>0?'cooking':'pending';
   return k;
 }
 function unfinishedForStall(s){
@@ -292,42 +367,76 @@ function unfinishedForStall(s){
 }
 function renderKitchen(){
   const active=db.stalls.filter(s=>Object.keys(s.order?.items||{}).length);
-  const filtered=kitchenFilter==='active'?active.filter(s=>unfinishedForStall(s)>0):active;
-  let waiting=0,partial=0,done=0;
-  active.forEach(s=>Object.entries(s.order.items||{}).forEach(([pid,q])=>{
-    let k=getKitchenState(s,pid);
-    if(k.served>=q)done++;else if(k.served>0)partial++;else waiting++;
-  }));
-  if($('kitchenSummary'))$('kitchenSummary').innerHTML=`<div class="kpi"><span>CHƯA LÊN</span><b>${waiting}</b></div><div class="kpi"><span>ĐANG LÊN</span><b>${partial}</b></div><div class="kpi"><span>ĐÃ ĐỦ</span><b>${done}</b></div><div class="kpi"><span>SẠP CÓ MÓN</span><b>${active.length}</b></div>`;
-  if(!$('kitchenList'))return;
-  const emptyText=kitchenFilter==='active'?'🎉 Tất cả món đã lên đủ':'Chưa có sạp nào có món';
-  $('kitchenList').innerHTML=filtered.length?filtered.map(s=>{
-    let customer=s.order?.customer?` · ${s.order.customer}`:'',u=unfinishedForStall(s);
-    return `<div class="kitchenCard"><div class="kitchenHead"><div><b>${s.name}${customer}</b><div class="muted">${u?u+' phần chưa lên':'Đã lên đủ toàn bộ'}</div></div><button class="link" onclick="currentStall='${s.id}';openStall('${s.id}')">Mở sạp</button></div>
-    ${Object.entries(s.order.items||{}).map(([pid,q])=>{
-      let p=prod(pid),k=getKitchenState(s,pid),pct=q?Math.min(100,(k.served/q)*100):0;
-      let cls=k.served>=q?'kServed':k.served>0?'kCooking':'kPending',txt=k.served>=q?'Đã lên đủ':k.served>0?'Đang lên':'Chưa lên';
-      return `<div class="kitchenItem"><div class="titlebar"><div><b>${p?.name||'Món'}</b><div class="muted">${q} ${p?.unit||'phần'} · đã lên ${k.served}/${q}</div></div><span class="kStatus ${cls}">${txt}</span></div><div class="kProgress"><i style="width:${pct}%"></i></div>
-      <div class="kActions"><button class="btn secondary" onclick="changeServed('${s.id}','${pid}',-1)">−</button><button class="btn primary" onclick="changeServed('${s.id}','${pid}',1)">+ Lên món</button><button class="btn green" onclick="serveAll('${s.id}','${pid}')">✓ Lên đủ</button></div>
-      <button class="link" style="margin-top:7px" onclick="cancelKitchenItem('${s.id}','${pid}')">Hủy món</button></div>`;
-    }).join('')}</div>`;
-  }).join(''):`<div class="box center muted" style="padding:24px">${emptyText}</div>`;
+  if(!active.length){
+    $('kitchenStallTabs').innerHTML='';$('kitchenSummary').innerHTML='';
+    $('kitchenList').innerHTML='<div class="box center muted" style="padding:24px">Chưa có sạp nào có món</div>';return;
+  }
+  if(!kitchenStallId||!active.some(s=>s.id===kitchenStallId))kitchenStallId=active[0].id;
+  $('kitchenStallTabs').innerHTML=active.map(s=>{
+    const u=unfinishedForStall(s);
+    return `<button class="${s.id===kitchenStallId?'on':''}" onclick="selectKitchenStall('${s.id}')">${s.name}${s.order?.customer?' · '+s.order.customer:''}${u?' · '+u+' thiếu':' · ✓'}</button>`;
+  }).join('');
+  const s=stall(kitchenStallId);let total=0,served=0;
+  Object.entries(s.order.items||{}).forEach(([pid,q])=>{let k=getKitchenState(s,pid);total+=+q||0;served+=k.served||0});
+  $('kitchenSummary').innerHTML=`<div class="kpi"><span>TỔNG</span><b>${total}</b></div><div class="kpi"><span>ĐÃ LÊN</span><b>${served}</b></div><div class="kpi"><span>CÒN THIẾU</span><b>${Math.max(0,total-served)}</b></div><div class="kpi"><span>TRẠNG THÁI</span><b>${served>=total?'✓ Đủ':'Đang lên'}</b></div>`;
+  $('kitchenList').innerHTML=`<div class="kitchenCard"><div class="kitchenHead"><div><b>${s.name}${s.order?.customer?' · '+s.order.customer:''}</b><div class="muted">${served>=total?'✅ Sạp này đã lên đủ món':'Kiểm từng đơn vị món trước khi thanh toán'}</div></div><button class="link" onclick="currentStall='${s.id}';openStall('${s.id}')">Mở bill</button></div>
+  ${Object.entries(s.order.items||{}).map(([pid,q])=>{
+    let p=prod(pid),k=getKitchenState(s,pid),pct=q?Math.min(100,(k.served/q)*100):0;
+    let cls=k.served>=q?'kServed':k.served>0?'kCooking':'kPending',txt=k.served>=q?'Đã đủ':k.served>0?'Đang lên':'Chưa lên';
+    const unitLabel=(p?.unit||'phần').toLowerCase();
+    const singular=unitLabel==='con'?'Con':unitLabel==='đĩa'?'Đĩa':unitLabel==='chai'?'Chai':unitLabel==='lon'?'Lon':unitLabel==='kg'?'Phần':'Phần';
+    const units=(k.units||[]).map((done,i)=>`<button class="unitChip ${done?'unitDone':''}" onclick="toggleKitchenUnit('${s.id}','${pid}',${i})">${done?'✓ ':''}${singular} ${i+1}</button>`).join('');
+    return `<div class="kitchenItem">
+      <div class="titlebar"><div><b>${p?.name||'Món'} × ${q}</b><div class="muted">Đã lên ${k.served}/${q} ${p?.unit||'phần'}</div></div><span class="kStatus ${cls}">${txt}</span></div>
+      <div class="kProgress"><i style="width:${pct}%"></i></div>
+      <div class="unitGrid">${units}</div>
+      <div class="kActions"><button class="btn secondary" onclick="markPreviousUnit('${s.id}','${pid}',false)">− 1 đã lên</button><button class="btn primary" onclick="markNextUnit('${s.id}','${pid}')">+ Lên 1</button><button class="btn green" onclick="serveAll('${s.id}','${pid}')">✓ Lên đủ</button></div>
+      <button class="link" style="margin-top:7px" onclick="cancelKitchenItem('${s.id}','${pid}')">Hủy món</button>
+    </div>`;
+  }).join('')}</div>`;
   save();
 }
+function selectKitchenStall(id){kitchenStallId=id;renderKitchen()}
+
+function toggleKitchenUnit(sid,pid,index){
+  const s=stall(sid);if(!s)return;
+  const k=getKitchenState(s,pid);
+  if(index<0||index>=k.units.length)return;
+  k.units[index]=!k.units[index];
+  getKitchenState(s,pid);save();renderKitchen();
+  if(currentStall===sid&&$('order')?.classList.contains('on'))renderCart();
+}
+function markNextUnit(sid,pid){
+  const s=stall(sid);if(!s)return;
+  const k=getKitchenState(s,pid);
+  const i=k.units.findIndex(x=>!x);
+  if(i>=0)k.units[i]=true;
+  getKitchenState(s,pid);save();renderKitchen();
+  if(currentStall===sid&&$('order')?.classList.contains('on'))renderCart();
+}
+function markPreviousUnit(sid,pid){
+  const s=stall(sid);if(!s)return;
+  const k=getKitchenState(s,pid);
+  for(let i=k.units.length-1;i>=0;i--){if(k.units[i]){k.units[i]=false;break}}
+  getKitchenState(s,pid);save();renderKitchen();
+  if(currentStall===sid&&$('order')?.classList.contains('on'))renderCart();
+}
+
 function setKitchenStatus(sid,pid,status){
   let s=stall(sid);if(!s)return;let k=getKitchenState(s,pid);k.status=status;
   if(status==='pending'&&k.served>=(s.order.items[pid]||0))k.served=0;
   save();renderKitchen();if(currentStall===sid&&$('order')?.classList.contains('on'))renderCart();
 }
 function changeServed(sid,pid,d){
-  let s=stall(sid);if(!s)return;let q=+(s.order.items?.[pid]||0),k=getKitchenState(s,pid);
-  k.served=Math.max(0,Math.min(q,(k.served||0)+d));
-  k.status=k.served>=q?'served':(k.served>0?'cooking':'pending');
-  save();renderKitchen();if(currentStall===sid&&$('order')?.classList.contains('on'))renderCart();
+  if(d>0)return markNextUnit(sid,pid);
+  return markPreviousUnit(sid,pid);
 }
 function serveAll(sid,pid){
-  let s=stall(sid);if(!s)return;let q=+(s.order.items?.[pid]||0),k=getKitchenState(s,pid);
-  k.served=q;k.status='served';save();renderKitchen();if(currentStall===sid&&$('order')?.classList.contains('on'))renderCart();
+  const s=stall(sid);if(!s)return;
+  const k=getKitchenState(s,pid);
+  k.units=k.units.map(()=>true);
+  getKitchenState(s,pid);save();renderKitchen();
+  if(currentStall===sid&&$('order')?.classList.contains('on'))renderCart();
 }
 function cancelKitchenItem(sid,pid){
   let s=stall(sid);if(!s)return;let p=prod(pid);
@@ -366,7 +475,26 @@ function confirmCheckout(){
 }
 function finalizeCheckout(){let s=stall(currentStall),t=orderTotals(s);if(!t.qty)return alert('Bill chưa có món.');let rent=$('rentChoice').value==='none'?0:Math.max(0,+$('rentAmount').value||0),dis=Math.max(0,+$('discount').value||0),dep=Math.max(0,+$('depositOrder').value||0),rev=Math.max(0,t.sub+rent-dis),due=Math.max(0,rev-dep),items=Object.entries(s.order.items).map(([id,q])=>{let p=prod(id);return{id:p.id,name:p.name,unit:p.unit,qty:q,price:p.price,cost:p.cost}});let b={id:uid('bill'),code:'HD'+String(Date.now()).slice(-7),date:dateKey(),time:new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}),stallId:s.id,stallName:s.name,customer:$('customerOrder').value.trim(),items,kitchenSnapshot:JSON.parse(JSON.stringify(s.order.kitchen||{})),subtotal:t.sub,rent,rentChoice:$('rentChoice').value,discount:dis,deposit:dep,revenue:rev,due,cost:t.cost,updatedAt:Date.now(),pay:$('pay').value,note:$('orderNote').value};db.bills.unshift(b);s.order={};s.status='empty';save();showReceipt(b);renderHome()}
 function showReceipt(b){currentReceiptBill=b;let qr=db.settings.qr?`<div class="center"><img src="${db.settings.qr}" style="max-width:145px;border-radius:10px"><div class="muted">${db.settings.bank} · ${db.settings.account}<br>${db.settings.owner}</div></div>`:'';$('receipt').innerHTML=`<h2>THÁC DÊ CAMPING</h2><div class="center"><small>HÓA ĐƠN THANH TOÁN</small><br><b>${b.code}</b><br><small>${b.date} · ${b.time} · ${b.stallName}${b.customer?' · '+b.customer:''}</small></div><div class="dash"></div>${b.items.map(i=>`<div class="r"><span>${i.name} × ${i.qty}</span><b>${money(i.price*i.qty)}</b></div>`).join('')}<div class="dash"></div><div class="r"><span>Tiền món</span><span>${money(b.subtotal)}</span></div>${b.rent?`<div class="r"><span>Tiền sạp (${b.rentChoice==='large'?'Sạp to':b.rentChoice==='small'?'Sạp bé':''})</span><span>${money(b.rent)}</span></div>`:''}${b.discount?`<div class="r"><span>Giảm giá</span><span>-${money(b.discount)}</span></div>`:''}${b.deposit?`<div class="r"><span>Đã cọc</span><span>-${money(b.deposit)}</span></div>`:''}<div class="r total"><span>CÒN TRẢ</span><span>${money(b.due)}</span></div><div class="r"><span>Thanh toán</span><span>${b.pay}</span></div>${b.note?`<small>Ghi chú: ${b.note}</small>`:''}<div class="dash"></div>${qr}<div class="center"><small>Zalo/SĐT: ${db.settings.phone}<br>Cảm ơn quý khách!</small></div>`;$('receiptModal').style.display='flex'}
-function openStallManage(){renderStallManage();$('stallModal').style.display='flex'}function renderStallManage(){$('stallManage').innerHTML=db.stalls.map(s=>`<div class="row"><div><b>${s.name}</b><div class="muted">${s.type==='big'?'Sạp to':'Sạp bé'} · ${money(s.rent)}</div></div><div><button class="btn secondary" onclick="renameStall('${s.id}')">Tên</button> <button class="btn secondary" onclick="toggleType('${s.id}')">Chọn loại</button> <button class="btn red" onclick="deleteStall('${s.id}')">Xóa</button></div></div>`).join('')}function addStall(){pendingStallTypeAction={mode:'add'};openStallTypePicker('add')}function renameStall(id){let s=stall(id),n=prompt('Tên sạp / tên người đặt:',s.name);if(n){s.name=n.trim();save();renderStallManage();renderHome()}}function toggleType(id){pendingStallTypeAction={mode:'edit',id};openStallTypePicker('edit',id)}
+function openStallManage(){renderStallManage();$('stallModal').style.display='flex'}function renderStallManage(){$('stallManage').innerHTML=db.stalls.map(s=>`<div class="row"><div><b>${s.name}</b><div class="muted">${s.type==='big'?'Sạp to':'Sạp bé'} · ${money(s.rent)}</div></div><div><button class="btn secondary" onclick="renameStall('${s.id}')">Tên</button> <button class="btn secondary" onclick="toggleType('${s.id}')">Chọn loại</button> <button class="btn red" onclick="deleteStall('${s.id}')">Xóa</button></div></div>`).join('')}
+function toggleInlineAddStall(force){
+  const el=$('inlineAddStall');if(!el)return;
+  const show=force===undefined?(el.style.display==='none'):!!force;
+  el.style.display=show?'block':'none';
+  if(show){
+    $('inlineBigPrice').textContent=money(db.meta.largeStallPrice||300000);
+    $('inlineSmallPrice').textContent=money(db.meta.smallStallPrice||200000);
+  }
+}
+function quickAddStall(type){
+  const rent=type==='big'?(db.meta.largeStallPrice||300000):(db.meta.smallStallPrice||200000);
+  const used=new Set(db.stalls.map(s=>s.baseName||s.name));
+  let n=1,name='';
+  do{name='Sạp '+String(n).padStart(2,'0');n++}while(used.has(name));
+  db.stalls.push({id:uid('stall'),name,baseName:name,type,rent,status:'empty',order:{items:{},kitchen:{}},updatedAt:Date.now()});
+  save();toggleInlineAddStall(false);renderStallManage();renderHome();
+}
+
+function addStall(){pendingStallTypeAction={mode:'add'};openStallTypePicker('add')}function renameStall(id){let s=stall(id),n=prompt('Tên sạp / tên người đặt:',s.name);if(n){s.name=n.trim();save();renderStallManage();renderHome()}}function toggleType(id){pendingStallTypeAction={mode:'edit',id};openStallTypePicker('edit',id)}
 function openStallTypePicker(mode,id=null){
   pendingStallTypeAction={mode,id};
   $('stallTypeTitle').textContent=mode==='add'?'Chọn loại sạp mới':'Chọn loại sạp';
@@ -421,9 +549,49 @@ function savePurchase(){
 function inPeriod(date,p){let d=new Date(date+'T12:00:00'),n=new Date();if(p==='day')return date===dateKey(n);if(p==='month')return d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth();if(p==='year')return d.getFullYear()===n.getFullYear();let a=new Date(n);a.setHours(0,0,0,0);a.setDate(a.getDate()-((a.getDay()+6)%7));let z=new Date(a);z.setDate(z.getDate()+7);return d>=a&&d<z}/* V7 removed obsolete duplicate stats */
 
 function tabExpense(b){document.querySelectorAll('#expenses .tabs button').forEach(x=>x.classList.remove('on'));b.classList.add('on')}
-function openExpense(){$('expenseKind').value=expenseView;$('expenseDate').value=dateKey();$('expenseName').value='';$('expenseAmount').value='';$('expensePayer').value='';$('expenseNote').value='';toggleExpenseKind();$('expenseModal').style.display='flex'}
-function toggleExpenseKind(){let inv=$('expenseKind').value==='investment';$('expenseCategory').innerHTML=inv?'<option>Xi măng / cát / đá / sỏi</option><option>Bạt / dây thừng</option><option>Bàn ghế / sạp</option><option>Bếp / thiết bị</option><option>Xây dựng / sửa chữa</option><option>Khác</option>':'<option>Gia vị / mắm muối</option><option>Gas / than / nhiên liệu</option><option>Đá lạnh</option><option>Bao bì / túi / hộp</option><option>Nhân công</option><option>Điện nước</option><option>Vận chuyển</option><option>Khác</option>'}
-function saveExpense(){let kind=$('expenseKind').value,name=$('expenseName').value.trim(),amount=+$('expenseAmount').value||0,payer=$('expensePayer').value.trim();if(!name||amount<=0)return alert('Nhập nội dung và số tiền.');let x={id:uid(kind==='expense'?'expense':'investment'),date:$('expenseDate').value||dateKey(),name,category:$('expenseCategory').value,amount,payer,note:$('expenseNote').value};if(kind==='expense')db.expenses.unshift(x);else{db.investments=db.investments||[];db.investments.unshift(x)}save();expenseView=kind;closeM('expenseModal');renderExpenses();renderReport()}
+
+
+/* V8 removed obsolete duplicate addExpenseItem */
+/* V8 removed obsolete duplicate updateExpenseTotal */
+/* V8 removed obsolete duplicate saveExpenseSmart */
+
+
+function openExpense(){
+  const investment=expenseView==='investment';
+  $('expenseModalTitle').textContent=investment?'Ghi đầu tư':'Ghi chi phí vận hành';
+  $('operatingExpenseForm').style.display=investment?'none':'block';
+  $('investmentForm').style.display=investment?'block':'none';
+  if(investment){
+    $('investmentName').value='';$('investmentAmount').value='';$('investmentDate').value=dateKey();$('investmentPayer').value='';$('investmentNote').value='';
+  }else{
+    $('expensePayer').value='';$('expenseDate').value=dateKey();$('expenseNote').value='';$('expenseItems').innerHTML='';addExpenseItem();updateExpenseTotal();
+  }
+  $('expenseModal').style.display='flex';
+}
+function addExpenseItem(name='',amount=''){
+  const d=document.createElement('div');d.className='form2 expenseItem';d.style.marginBottom='7px';
+  d.innerHTML=`<input class="ename" placeholder="Mua gì? VD gas, mắm, đá..." value="${name}"><input class="eamount" type="number" placeholder="Số tiền" value="${amount}" oninput="updateExpenseTotal()">`;
+  $('expenseItems').appendChild(d);updateExpenseTotal();
+}
+function updateExpenseTotal(){
+  $('expenseItemsTotal').textContent=money([...document.querySelectorAll('.expenseItem .eamount')].reduce((a,x)=>a+(+x.value||0),0));
+}
+function saveExpenseSmart(){
+  if(expenseView==='investment'){
+    const name=$('investmentName').value.trim(),amount=+$('investmentAmount').value||0,payer=$('investmentPayer').value.trim();
+    if(!name||amount<=0)return alert('Nhập nội dung đầu tư và số tiền.');
+    db.investments.unshift({id:uid('investment'),date:$('investmentDate').value||dateKey(),name,category:'Đầu tư',amount,payer,note:$('investmentNote').value.trim(),updatedAt:Date.now()});
+  }else{
+    const payer=$('expensePayer').value.trim();
+    const items=[...document.querySelectorAll('.expenseItem')].map(x=>({name:x.querySelector('.ename').value.trim(),amount:+x.querySelector('.eamount').value||0})).filter(x=>x.name&&x.amount>0);
+    if(!payer)return alert('Nhập người cầm tiền.');
+    if(!items.length)return alert('Thêm ít nhất một món chi phí.');
+    const total=items.reduce((a,x)=>a+x.amount,0);
+    db.expenses.unshift({id:uid('expense'),date:$('expenseDate').value||dateKey(),name:items.map(x=>x.name).join(' + '),category:'Chi phí vận hành',amount:total,payer,note:$('expenseNote').value.trim(),items,updatedAt:Date.now()});
+  }
+  save();closeM('expenseModal');renderExpenses();renderReport();
+}
+
 function renderExpenses(){db.investments=db.investments||[];let et=db.expenses.filter(x=>x.date===dateKey()).reduce((a,x)=>a+x.amount,0),it=db.investments.filter(x=>x.date===dateKey()).reduce((a,x)=>a+x.amount,0);$('eToday').textContent=money(et);$('iToday').textContent=money(it);let arr=expenseView==='expense'?db.expenses:db.investments;$('expenseList').innerHTML=arr.length?arr.slice(0,60).map(x=>`<div class="row"><div><b>${x.name}</b><div class="muted">${x.date} · ${x.category}${x.payer?' · '+x.payer+' trả':''}${x.note?' · '+x.note:''}</div></div><div style="text-align:right"><b>${money(x.amount)}</b><div><button class="link" onclick="deleteExpense('${expenseView}','${x.id}')">Xóa</button></div></div></div>`).join(''):'<div class="center muted" style="padding:18px">Chưa có khoản nào</div>'}
 function deleteExpense(kind,id){if(!confirm('Xóa khoản này?'))return;let k=kind==='expense'?'expenses':'investments';db[k]=db[k].filter(x=>x.id!==id);save();renderExpenses();renderReport()}
 /* V7 removed obsolete duplicate renderReport */
@@ -435,7 +603,7 @@ function capitalLedger(){let p={};db.purchases.forEach(x=>x.contributors.forEach
 function openDebts(){let p=capitalLedger();$('debtList').innerHTML=Object.keys(p).length?Object.entries(p).sort((a,b)=>b[1]-a[1]).map(([n,a])=>`<div class="row"><b>${n}</b><b>${money(a)}</b></div>`).join(''):'<div class="center muted" style="padding:18px">Chưa có công nợ</div>';$('repayDate').value=dateKey();$('repayPerson').value='';$('repayAmount').value='';$('repayNote').value='';$('debtsModal').style.display='flex'}
 function saveRepayment(){let person=$('repayPerson').value.trim(),amount=+$('repayAmount').value||0;if(!person||amount<=0)return alert('Nhập người nhận và số tiền hoàn.');db.repayments.unshift({id:uid('repay'),person,amount,date:$('repayDate').value||dateKey(),note:$('repayNote').value,updatedAt:Date.now()});save();openDebts()}
 function openSettings(){setTimeout(()=>{if($('smallStallPrice'))$('smallStallPrice').value=db.meta.smallStallPrice||200000;if($('largeStallPrice'))$('largeStallPrice').value=db.meta.largeStallPrice||300000},0);let s=db.settings;$('shopName').value=s.shopName;$('shopPhone').value=s.phone;$('bankName').value=s.bank;$('bankAcc').value=s.account;$('bankOwner').value=s.owner;$('settingsModal').style.display='flex'}async function saveSettings(){if($('smallStallPrice'))db.meta.smallStallPrice=+$('smallStallPrice').value||0;if($('largeStallPrice'))db.meta.largeStallPrice=+$('largeStallPrice').value||0;let qr=await fileData($('qrFile').files[0]);Object.assign(db.settings,{shopName:$('shopName').value||'THÁC DÊ CAMPING',phone:$('shopPhone').value,bank:$('bankName').value,account:$('bankAcc').value,owner:$('bankOwner').value,qr:qr||db.settings.qr});save();alert('Đã lưu.')}
-function download(c,n,t){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:t}));a.download=n;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}function exportData(){download(JSON.stringify(db,null,2),'thac-de-camping-pos-'+dateKey()+'.json','application/json')}function mergeArr(local,inc){let m=new Map(local.map(x=>[x.id,x]));inc.forEach(x=>{let old=m.get(x.id);if(!old||(x.updatedAt||0)>=(old.updatedAt||0))m.set(x.id,x)});return [...m.values()]}async function importData(file){if(!file)return;try{let backup=JSON.stringify(db);localStorage.setItem(KEY+'_PRE_IMPORT_BACKUP',backup);let inc=JSON.parse(await file.text());['stalls','products','bills','purchases','expenses','investments','preorders','settlements','repayments'].forEach(k=>db[k]=mergeArr(db[k]||[],inc[k]||[]));if(inc.settings)db.settings={...db.settings,...inc.settings};save();alert('Đã gộp dữ liệu: ID trùng được ghi đè, ID mới được bổ sung.');location.reload()}catch(e){alert('File dữ liệu không hợp lệ.')}}
+function download(c,n,t){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:t}));a.download=n;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}function exportData(){download(JSON.stringify(db,null,2),'ThacDe-Backup-'+dateKey()+'-'+new Date().toTimeString().slice(0,5).replace(':','')+'.json','application/json')}function mergeArr(local,inc){let m=new Map(local.map(x=>[x.id,x]));inc.forEach(x=>{let old=m.get(x.id);if(!old||(x.updatedAt||0)>=(old.updatedAt||0))m.set(x.id,x)});return [...m.values()]}async function importData(file){if(!file)return;try{let backup=JSON.stringify(db);localStorage.setItem(KEY+'_PRE_IMPORT_BACKUP',backup);let inc=JSON.parse(await file.text());['stalls','products','bills','purchases','expenses','investments','preorders','settlements','repayments'].forEach(k=>db[k]=mergeArr(db[k]||[],inc[k]||[]));if(inc.settings)db.settings={...db.settings,...inc.settings};save();alert('Đã gộp dữ liệu: ID trùng được ghi đè, ID mới được bổ sung.');location.reload()}catch(e){alert('File dữ liệu không hợp lệ.')}}
 function restorePreImport(){let x=localStorage.getItem(KEY+'_PRE_IMPORT_BACKUP');if(!x)return alert('Chưa có bản sao trước khi nhập.');if(confirm('Khôi phục dữ liệu trước lần nhập gần nhất?')){localStorage.setItem(KEY,x);location.reload()}}function exportCSV(){let rows=[['Mã bill','Ngày','Giờ','Sạp','Khách','Doanh thu','Cọc','Còn trả','Thanh toán']];db.bills.forEach(b=>rows.push([b.code,b.date,b.time,b.stallName,b.customer||'',b.revenue,b.deposit,b.due,b.pay]));download('\ufeff'+rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(',')).join('\n'),'bao-cao-'+dateKey()+'.csv','text/csv')}
 
 function openPre(){preItems={};$('preCustomer').value='';$('prePhone').value='';$('preDate').value=dateKey();$('preStart').value='09:00';$('preEnd').value='14:00';$('preDeposit').value='';$('preNote').value='';$('preStalls').innerHTML=db.stalls.map(s=>`<label class="row"><span><b>${s.name}</b><div class="muted">${s.type==='big'?'Sạp to':'Sạp bé'}</div></span><input class="preStallCheck" type="checkbox" value="${s.id}" style="width:auto"></label>`).join('');$('preProducts').innerHTML=db.products.map(p=>`<div class="row"><span>${p.name}</span><input style="width:90px" type="number" min="0" value="0" oninput="preItems['${p.id}']=+this.value||0"></div>`).join('');$('preModal').style.display='flex'}
@@ -443,7 +611,7 @@ function timeOverlap(a1,a2,b1,b2){return a1<b2&&b1<a2}
 function savePreV5(){let customer=$('preCustomer').value.trim(),date=$('preDate').value,start=$('preStart').value,end=$('preEnd').value,ids=[...document.querySelectorAll('.preStallCheck:checked')].map(x=>x.value);if(!customer||!date||!start||!end||!ids.length)return alert('Nhập khách, ngày, giờ và chọn ít nhất 1 sạp.');if(start>=end)return alert('Giờ kết thúc phải sau giờ bắt đầu.');let conflict=db.preorders.find(p=>p.status==='reserved'&&p.date===date&&timeOverlap(start,end,p.start||p.time||'00:00',p.end||'23:59')&&(p.stallIds||[p.stallId]).some(id=>ids.includes(id)));if(conflict)return alert('Bị trùng lịch với '+conflict.customer+' ('+(conflict.stallNames||[conflict.stallName]).join(', ')+').');let names=ids.map(id=>stall(id)?.name).filter(Boolean),o={id:uid('pre'),customer,phone:$('prePhone').value.trim(),date,start,end,time:start,stallIds:ids,stallNames:names,stallId:ids[0],stallName:names[0],deposit:+$('preDeposit').value||0,note:$('preNote').value,items:{...preItems},status:'reserved',updatedAt:Date.now()};db.preorders.unshift(o);ids.forEach(id=>{let s=stall(id);if(s&&s.status==='empty')s.status='reserved'});save();closeM('preModal');renderPreorders();renderHome()}
 function renderPreorders(){let a=[...db.preorders].sort((x,y)=>(x.date+(x.start||x.time||'')).localeCompare(y.date+(y.start||y.time||'')));$('preList').innerHTML=a.length?a.map(p=>`<div class="box precard" style="margin-bottom:9px"><div class="row"><div><b>${p.customer}</b><div class="muted">${p.date} · ${p.start||p.time||''}${p.end?'–'+p.end:''} · ${(p.stallNames||[p.stallName]).join(', ')}</div><div class="muted">${p.phone||''}${p.deposit?' · Cọc '+money(p.deposit):''}</div></div><span class="tag ${p.status==='reserved'?'reserved':'empty'}">${p.status==='reserved'?'Đã đặt':p.status}</span></div>${p.status==='reserved'?`<div class="actions" style="padding:8px"><button class="btn secondary" onclick="cancelPre('${p.id}')">Hủy</button><button class="btn primary" onclick="startPreV5('${p.id}')">Khách đã đến</button></div>`:''}</div>`).join(''):'<div class="box center muted" style="padding:20px">Chưa có đặt trước</div>'}
 function cancelPre(id){let p=db.preorders.find(x=>x.id===id);if(!p)return;p.status='cancelled';(p.stallIds||[p.stallId]).forEach(id=>{let s=stall(id);if(s&&s.status==='reserved')s.status='empty'});save();renderPreorders();renderHome()}
-function startPreV5(id){let p=db.preorders.find(x=>x.id===id),ids=p.stallIds||[p.stallId];p.status='arrived';ids.forEach((id,i)=>{let s=stall(id);if(!s)return;s.status='using';s.order=s.order||{items:{}};s.order.items=s.order.items||{};s.order.customer=p.customer;s.order.deposit=i===0?p.deposit:0;s.order.preorderId=p.id;Object.entries(p.items||{}).forEach(([pid,q])=>{if(q>0&&i===0){s.order.items[pid]=(s.order.items[pid]||0)+q;s.order.kitchen=s.order.kitchen||{};s.order.kitchen[pid]=s.order.kitchen[pid]||{status:'pending',served:0}}})});save();closeM('preModal');openStall(ids[0])}
+function startPreV5(id){let p=db.preorders.find(x=>x.id===id),ids=p.stallIds||[p.stallId];p.status='arrived';ids.forEach((id,i)=>{let s=stall(id);if(!s)return;s.status='using';s.order=s.order||{items:{}};s.order.items=s.order.items||{};s.order.customer=p.customer;s.order.deposit=i===0?p.deposit:0;s.order.preorderId=p.id;Object.entries(p.items||{}).forEach(([pid,q])=>{if(q>0&&i===0){s.order.items[pid]=(s.order.items[pid]||0)+q;s.order.kitchen=s.order.kitchen||{};s.order.kitchen[pid]=s.order.kitchen[pid]||{status:'pending',served:0,units:Array(q).fill(false)}}})});save();closeM('preModal');openStall(ids[0])}
 /* V7 removed obsolete duplicate openRecon */
 
 
@@ -581,7 +749,7 @@ function renderDaySettlement(day){
     <h2>THÁC DÊ CAMPING</h2><div class="subtitle">BÁO CÁO CHỐT NGÀY · ${day}${closed?' · ĐÃ CHỐT':''}</div>
     <div class="settleTotal">
       <div class="line"><span>Doanh thu</span><b>${money(n.revenue)}</b></div>
-      <div class="line"><span>Mua hàng thực tế</span><b>− ${money(n.purchaseCost)}</b></div>
+      <div class="line"><span>Nguyên liệu / hàng bán</span><b>− ${money(n.purchaseCost)}</b></div>
       <div class="line"><span>Chi phí vận hành</span><b>− ${money(n.operating)}</b></div>
       <div class="dash"></div><div>LỢI NHUẬN VỀ TAY</div><div class="bigProfit">${money(n.profit)}</div>
       <div class="muted">Đầu tư trong ngày (theo dõi riêng): ${money(n.investment||0)}</div>
@@ -629,7 +797,7 @@ window.addEventListener('afterprint',()=>document.body.classList.remove('print-d
 function exportDayCSV(){
   const day=$('settleDate').value||dateKey(),r=rawDayData(day),rows=[
     ['THÁC DÊ CAMPING - CHỐT NGÀY',day],
-    ['Doanh thu',r.revenue],['Mua hàng thực tế',r.purchaseCost],['Chi phí vận hành',r.operating],['Lợi nhuận về tay',r.profit],['Đầu tư (riêng)',r.investment],[],
+    ['Doanh thu',r.revenue],['Nguyên liệu / hàng bán',r.purchaseCost],['Chi phí vận hành',r.operating],['Lợi nhuận về tay',r.profit],['Đầu tư (riêng)',r.investment],[],
     ['NGƯỜI ỨNG','SỐ TIỀN'],...Object.entries(r.contributors),[],
     ['MUA HÀNG','GẮN VỚI','SỐ TIỀN','NGƯỜI TRẢ'],
     ...r.purchases.map(x=>[x.name||x.productName||'Mua hàng',x.buyFor||'Dùng chung',x.total||x.amount,(x.contributors||[]).map(c=>c.person+': '+c.amount).join(' | ')]),[],
