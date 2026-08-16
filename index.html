@@ -95,7 +95,7 @@
 
 <section id="expenses" class="page">
 <div class="titlebar"><div class="title">Chi phí & đầu tư</div><button class="link" onclick="openExpense()">+ Ghi khoản chi</button></div>
-<div class="tabs"><button class="on" onclick="expenseView='expense',kitchenFilter='active',kitchenStallId=null;tabExpense(this);renderExpenses()">Chi phí vận hành</button><button onclick="expenseView='investment';tabExpense(this);renderExpenses()">Đầu tư tài sản</button></div>
+<div class="tabs"><button class="on" onclick="expenseView='expense';tabExpense(this);renderExpenses()">Chi phí vận hành</button><button onclick="expenseView='investment';tabExpense(this);renderExpenses()">Đầu tư tài sản</button></div>
 <div class="kpis"><div class="kpi"><span>CHI PHÍ HÔM NAY</span><b id="eToday">0 ₫</b></div><div class="kpi"><span>ĐẦU TƯ HÔM NAY</span><b id="iToday">0 ₫</b></div></div>
 <div class="section"><div class="title">Danh sách</div><div id="expenseList" class="box"></div></div>
 </section>
@@ -274,7 +274,7 @@
 <script>
 const SEED={"settings": {"shopName": "THÁC DÊ CAMPING", "phone": "0906 068 198", "bank": "MB Bank", "account": "0123456789", "owner": "CHỦ TÀI KHOẢN", "qr": ""}, "stalls": [{"id": "s1", "name": "Sạp 01", "type": "big", "rent": 300000, "status": "empty", "order": {}}, {"id": "s2", "name": "Sạp 02", "type": "small", "rent": 200000, "status": "empty", "order": {}}, {"id": "s3", "name": "Sạp 03", "type": "big", "rent": 300000, "status": "empty", "order": {}}, {"id": "s4", "name": "Sạp 04", "type": "small", "rent": 200000, "status": "empty", "order": {}}], "products": [{"id": "p1", "name": "Gà nướng", "unit": "con", "price": 350000, "cost": 210000, "stock": 20, "icon": "🍗", "image": ""}, {"id": "p2", "name": "Cá rô nướng", "unit": "con", "price": 150000, "cost": 90000, "stock": 30, "icon": "🐟", "image": ""}, {"id": "p3", "name": "Chim nướng", "unit": "con", "price": 35000, "cost": 20000, "stock": 50, "icon": "🍖", "image": ""}, {"id": "p4", "name": "Tôm nướng", "unit": "con", "price": 15000, "cost": 9000, "stock": 100, "icon": "🦐", "image": ""}, {"id": "p5", "name": "Rau xào", "unit": "đĩa", "price": 50000, "cost": 28000, "stock": 40, "icon": "🥬", "image": ""}, {"id": "p6", "name": "Măng nứa xào", "unit": "đĩa", "price": 50000, "cost": 28000, "stock": 40, "icon": "🥘", "image": ""}, {"id": "p7", "name": "Hàu hấp", "unit": "kg", "price": 50000, "cost": 30000, "stock": 40, "icon": "🦪", "image": ""}], "bills": [], "purchases": [], "expenses": [], "preorders": [], "settlements": []}, KEY='BAITAM_POS_SPEC_V1';let currentReceiptBill=null;
 let pendingStallTypeAction=null;
-let db=JSON.parse(localStorage.getItem(KEY)||'null')||SEED,currentStall=null,filterProd='all',reportPeriod='day',editProduct=null,preItems={},expenseView='expense';
+let db=JSON.parse(localStorage.getItem(KEY)||'null')||SEED,currentStall=null,filterProd='all',reportPeriod='day',editProduct=null,preItems={},expenseView='expense',kitchenStallId=null;
 db.investments=db.investments||[];db.repayments=db.repayments||[];db.products.forEach(p=>{p.unit=p.unit||'phần';p.price=+p.price||0;p.updatedAt=p.updatedAt||0;delete p.stock;delete p.cost;});
 db.purchases.forEach(x=>{if(!x.name)x.name=x.productName||'Mua hàng';if(!x.total)x.total=+x.amount||((+x.qty||0)*(+x.unitCost||0));x.buyFor=x.buyFor||'Dùng chung';x.contributors=x.contributors||[];x.updatedAt=x.updatedAt||0;});
 
@@ -285,12 +285,12 @@ if(!db.meta.brandMigratedToThacDe){
   db.meta.brandMigratedToThacDe=true;
   localStorage.setItem(KEY,JSON.stringify(db));
 }
-db.meta=db.meta||{};db.meta.version=8;db.meta.smallStallPrice=db.meta.smallStallPrice||200000;db.meta.largeStallPrice=db.meta.largeStallPrice||300000;
+db.meta=db.meta||{};db.meta.version=10;db.meta.smallStallPrice=db.meta.smallStallPrice||200000;db.meta.largeStallPrice=db.meta.largeStallPrice||300000;
 db.stalls.forEach(s=>{s.baseName=s.baseName||s.name;s.order=s.order||{};s.order.items=s.order.items||{};if(s.rentEnabled===undefined)s.rentEnabled=true});
 db.bills.forEach(b=>{b.updatedAt=b.updatedAt||new Date((b.date||dateKey())+'T'+(b.time||'00:00')).getTime()||0});
 
 // ===== V6 KITCHEN / SERVING MIGRATION =====
-db.meta=db.meta||{};db.meta.version=8;
+db.meta=db.meta||{};db.meta.version=10;
 db.stalls.forEach(s=>{
   s.order=s.order||{};s.order.items=s.order.items||{};s.order.kitchen=s.order.kitchen||{};
   Object.entries(s.order.items).forEach(([pid,q])=>{
@@ -305,11 +305,34 @@ const $=id=>document.getElementById(id),money=n=>(+n||0).toLocaleString('vi-VN')
 function dateKey(d=new Date()){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function show(id,b){document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));$(id).classList.add('on');if(b){document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('on'));b.classList.add('on')}if(id==='home')renderHome();if(id==='preorders')renderPreorders();if(id==='inventory')renderInventory();if(id==='expenses')renderExpenses();if(id==='kitchen')renderKitchen();if(id==='reports')renderReport()}
 function tabOn(b){document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));b.classList.add('on')}function periodOn(b){document.querySelectorAll('.periods button').forEach(x=>x.classList.remove('on'));b.classList.add('on')}function closeM(id){$(id).style.display='none'}function openMore(){$('moreModal').style.display='flex'}
-function orderTotals(s){let sub=0,cost=0,qty=0;Object.entries(s.order?.items||{}).forEach(([id,q])=>{let p=prod(id);if(p){sub+=p.price*q;cost+=p.cost*q;qty+=q}});return{sub,cost,qty}}
-function statusInfo(s){if(s.status==='reserved')return['Đã đặt trước','reserved'];if(s.status==='using')return['Đang sử dụng','using'];if(s.status==='waiting')return['Chờ thanh toán','waiting'];return['Trống','empty']}
-function renderHome(){let t=stats('day');$('todayRev').textContent=money(t.rev);$('todayProfit').textContent=money(t.profit);$('todayBills').textContent=t.bills.length;$('preCount').textContent=db.preorders.filter(x=>x.status==='reserved').length;let np=db.preorders.filter(x=>x.status==='reserved'&&(x.date||'')>=dateKey()).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time))[0];$('nextPre').innerHTML=np?`<div class="row"><div><b>${np.customer}</b><div class="muted">${np.date} · ${(np.stallNames||[np.stallName]).join(', ')} · Cọc ${money(np.deposit)}</div></div><span class="tag reserved">Đã đặt</span></div>`:'<div class="center muted" style="padding:14px">Không có đặt trước sắp tới</div>';$('stallGrid').innerHTML=db.stalls.map(s=>{let z=orderTotals(s),st=statusInfo(s);return `<button class="stall" onclick="openStall('${s.id}')"><b>${s.name}</b><div class="muted">${s.type==='big'?'Sạp to':'Sạp bé'} · ${money(s.rent)}</div><div class="money">${money(z.sub)}</div><span class="tag ${st[1]}">${st[0]}</span>${s.order?.customer?`<div class="muted" style="margin-top:5px">👤 ${s.order.customer}</div>`:''}</button>`}).join('')}
-function openStall(id){currentStall=id;let s=stall(id);if(!s.order)s.order={items:{}};if(!s.order.items)s.order.items={};show('order');$('orderTitle').textContent=s.name;let st=statusInfo(s);$('orderStatus').textContent=st[0];$('orderStatus').className='tag '+st[1];$('customerOrder').value=s.order.customer||'';$('depositOrder').value=s.order.deposit||'';$('orderNote').value=s.order.note||'';$('pay').value=s.order.pay||'Tiền mặt';$('discount').value=s.order.discount||'';let rt=s.order.rentChoice||(String(s.type||'').toLowerCase().includes('to')?'large':'small');$('rentChoice').value=rt;$('rentAmount').value=s.order.rentAmount??(rt==='large'?db.meta.largeStallPrice:rt==='small'?db.meta.smallStallPrice:0);let cm=$('customerMini');cm.style.display=s.order.customer?'inline-block':'none';cm.textContent=s.order.customer||'';renderProductPicker();renderCart()}
-function renderProductPicker(){$('productPicker').innerHTML=db.products.filter(p=>filterProd==='all'||p.stock>0).map(p=>`<div class="prod"><div class="pic" ${p.image?`style="background-image:url('${p.image}');font-size:0"`:''}>${p.image?'':p.icon||'📦'}</div><div class="pbody"><div class="pname">${p.name}</div><div class="muted">${p.unit||'phần'}</div><div class="price">${money(p.price)}/${p.unit}</div><button class="btn green full" onclick="addItem('${p.id}')">+ Thêm</button></div></div>`).join('')}
+function orderTotals(s){let sub=0,qty=0;Object.entries(s.order?.items||{}).forEach(([id,q])=>{let p=prod(id);if(p){sub+=(+p.price||0)*(+q||0);qty+=+q||0}});return{sub,qty}}
+
+function nextReservationForStall(sid){
+ return db.preorders.filter(p=>p.status==='reserved'&&(p.stallIds||[p.stallId]).includes(sid)&&(p.date||'')>=dateKey()).sort((a,b)=>(a.date+(a.start||a.time||'')).localeCompare(b.date+(b.start||b.time||'')))[0]||null;
+}
+function statusInfo(s){
+ if(s.status==='using')return['Đang sử dụng','using'];if(s.status==='waiting')return['Chờ thanh toán','waiting'];
+ const r=nextReservationForStall(s.id);if(r)return[r.date===dateKey()?'Đặt '+(r.start||r.time||''):'Đặt '+r.date,'reserved'];
+ return['Trống','empty'];
+}
+function renderHome(){
+ let t=stats('day');$('todayRev').textContent=money(t.rev);$('todayProfit').textContent=money(t.profit);$('todayBills').textContent=t.bills.length;$('preCount').textContent=db.preorders.filter(x=>x.status==='reserved').length;
+ let np=db.preorders.filter(x=>x.status==='reserved'&&(x.date||'')>=dateKey()).sort((a,b)=>(a.date+(a.start||a.time||'')).localeCompare(b.date+(b.start||b.time||'')))[0];
+ $('nextPre').innerHTML=np?`<div class="row"><div><b>${np.customer}</b><div class="muted">${np.date} · ${np.start||np.time||''}${np.end?'–'+np.end:''} · ${(np.stallNames||[np.stallName]).join(', ')} · Cọc ${money(np.deposit)}</div></div><span class="tag reserved">Đã đặt</span></div>`:'<div class="center muted" style="padding:14px">Không có đặt trước sắp tới</div>';
+ $('stallGrid').innerHTML=db.stalls.map(s=>{let z=orderTotals(s),st=statusInfo(s),u=Object.keys(s.order?.items||{}).length?unfinishedForStall(s):0;return `<button class="stall" onclick="openStall('${s.id}')"><b>${s.name}</b><div class="muted">${s.type==='big'?'Sạp to':'Sạp bé'} · ${money(s.rent)}</div><div class="money">${money(z.sub)}</div><span class="tag ${st[1]}">${st[0]}</span>${s.order?.customer?`<div class="muted" style="margin-top:5px">👤 ${s.order.customer}</div>`:''}${Object.keys(s.order?.items||{}).length?`<div class="muted" style="margin-top:4px">🍳 ${u?`Còn ${u} phần chưa lên`:'Đã lên đủ món'}</div>`:''}</button>`}).join('');
+}
+function openStall(id){
+ currentStall=id;let s=stall(id);if(!s)return;
+ s.order=s.order||{};s.order.items=s.order.items||{};s.order.kitchen=s.order.kitchen||{};
+ show('order');$('orderTitle').textContent=s.name;let st=statusInfo(s);$('orderStatus').textContent=st[0];$('orderStatus').className='tag '+st[1];
+ $('customerOrder').value=s.order.customer||'';$('depositOrder').value=s.order.deposit||'';$('orderNote').value=s.order.note||'';$('pay').value=s.order.pay||'Tiền mặt';$('discount').value=s.order.discount||'';
+ const typ=String(s.type||'').toLowerCase();let rt=s.order.rentChoice||((typ==='big'||typ==='large'||typ==='to'||typ.includes('to'))?'large':'small');
+ $('rentChoice').value=rt;$('rentAmount').value=s.order.rentAmount??(rt==='large'?(db.meta.largeStallPrice||300000):rt==='small'?(db.meta.smallStallPrice||200000):0);
+ let cm=$('customerMini');cm.style.display=s.order.customer?'inline-block':'none';cm.textContent=s.order.customer||'';renderProductPicker();renderCart();
+}
+function renderProductPicker(){
+ $('productPicker').innerHTML=db.products.map(p=>`<div class="prod"><div class="pic" ${p.image?`style="background-image:url('${p.image}');font-size:0"`:''}>${p.image?'':p.icon||'🍽️'}</div><div class="pbody"><div class="pname">${p.name}</div><div class="muted">${p.unit||'phần'}</div><div class="price">${money(p.price)}/${p.unit||'phần'}</div><button class="btn green full" onclick="addItem('${p.id}')">+ Thêm</button></div></div>`).join('');
+}
 function addItem(id){
   let s=stall(currentStall);
   s.order=s.order||{items:{},kitchen:{}};s.order.items=s.order.items||{};s.order.kitchen=s.order.kitchen||{};
@@ -322,29 +345,29 @@ function addItem(id){
   save();renderCart();renderKitchen();
 }
 function qchg(id,d){
-  let s=stall(currentStall);s.order.kitchen=s.order.kitchen||{};
+  const s=stall(currentStall);if(!s)return;s.order=s.order||{};s.order.items=s.order.items||{};s.order.kitchen=s.order.kitchen||{};
   s.order.items[id]=(s.order.items[id]||0)+d;
-  if(s.order.items[id]<=0){
-    delete s.order.items[id];
-    delete s.order.kitchen[id];
-  }else{
-    let k=s.order.kitchen[id]||(s.order.kitchen[id]={status:'pending',served:0,units:[]});
-    if(!Array.isArray(k.units))k.units=[];
-    while(k.units.length<s.order.items[id])k.units.push(false);
-    if(k.units.length>s.order.items[id])k.units=k.units.slice(0,s.order.items[id]);
-    getKitchenState(s,id);
-  }
-  save();renderCart();renderKitchen();
+  if(s.order.items[id]<=0){delete s.order.items[id];delete s.order.kitchen[id]}
+  else{let k=s.order.kitchen[id]||(s.order.kitchen[id]={status:'pending',served:0,units:[]});if(!Array.isArray(k.units))k.units=[];while(k.units.length<s.order.items[id])k.units.push(false);if(k.units.length>s.order.items[id])k.units=k.units.slice(0,s.order.items[id]);getKitchenState(s,id)}
+  save();renderCart();if($('kitchen')?.classList.contains('on'))refreshKitchenViews(s.id);
 }
-function applyRentChoice(){let c=$('rentChoice').value;$('rentAmount').value=c==='large'?db.meta.largeStallPrice:c==='small'?db.meta.smallStallPrice:0;renderCart()}function renderCart(){let s=stall(currentStall),sub=0;$('cart').innerHTML=Object.keys(s.order.items).length?Object.entries(s.order.items).map(([id,q])=>{let p=prod(id);sub+=p.price*q;return `<div class="row"><div><b>${p.name}</b><div class="muted">${money(p.price)} × ${q} ${p.unit}</div></div><div class="qty"><button onclick="qchg('${id}',-1)">−</button><b>${q}</b><button onclick="qchg('${id}',1)">+</button></div></div>`}).join(''):'<div class="center muted" style="padding:18px">Chưa có món</div>';let rent=$('rentChoice').value==='none'?0:Math.max(0,+$('rentAmount').value||0),dis=Math.max(0,+$('discount').value||0),dep=Math.max(0,+$('depositOrder').value||0),due=Math.max(0,sub+rent-dis-dep);$('sub').textContent=money(sub);$('rentSum').textContent=money(rent);$('dis').textContent=money(dis);$('dep').textContent=money(dep);$('due').textContent=money(due)}
-function saveOpenOrder(){let s=stall(currentStall);s.order.kitchen=s.order.kitchen||{};s.order.customer=$('customerOrder').value.trim();s.order.deposit=+$('depositOrder').value||0;s.order.note=$('orderNote').value;s.order.pay=$('pay').value;s.order.discount=+$('discount').value||0;s.order.rentChoice=$('rentChoice').value;s.order.rentAmount=+$('rentAmount').value||0;if(s.status==='empty')s.status='using';save();show('home')}
+function applyRentChoice(){let c=$('rentChoice').value;$('rentAmount').value=c==='large'?db.meta.largeStallPrice:c==='small'?db.meta.smallStallPrice:0;renderCart()}function renderCart(){
+  let s=stall(currentStall),sub=0;s.order.kitchen=s.order.kitchen||{};
+  $('cart').innerHTML=Object.keys(s.order.items).length?Object.entries(s.order.items).map(([id,q])=>{
+    let p=prod(id);sub+=p.price*q;let k=getKitchenState(s,id);
+    let status=k.served>=q?'✓ Đã lên đủ':`🍳 Đã lên ${k.served}/${q}`;
+    return `<div class="row"><div style="flex:1"><b>${p.name}</b><div class="muted">${money(p.price)} × ${q} ${p.unit}</div><div class="muted">${status}</div></div><div class="qty"><button onclick="qchg('${id}',-1)">−</button><b>${q}</b><button onclick="qchg('${id}',1)">+</button></div></div>`;
+  }).join(''):'<div class="center muted" style="padding:18px">Chưa có món</div>';
+  let rent=$('rentChoice').value==='none'?0:Math.max(0,+$('rentAmount').value||0),dis=Math.max(0,+$('discount').value||0),dep=Math.max(0,+$('depositOrder').value||0),due=Math.max(0,sub+rent-dis-dep);
+  $('sub').textContent=money(sub);$('rentSum').textContent=money(rent);$('dis').textContent=money(dis);$('dep').textContent=money(dep);$('due').textContent=money(due);
+}function saveOpenOrder(){let s=stall(currentStall);s.order.kitchen=s.order.kitchen||{};s.order.customer=$('customerOrder').value.trim();s.order.deposit=+$('depositOrder').value||0;s.order.note=$('orderNote').value;s.order.pay=$('pay').value;s.order.discount=+$('discount').value||0;s.order.rentChoice=$('rentChoice').value;s.order.rentAmount=+$('rentAmount').value||0;if(s.status==='empty')s.status='using';save();show('home')}
 
 
 // ===== V7 CLEAN MIGRATION =====
-db.meta=db.meta||{};db.meta.version=8;db.meta.appName='Thác Dê Camping';
+db.meta=db.meta||{};db.meta.version=10;db.meta.appName='Thác Dê Camping';
 
 // ===== V8.1 PER-UNIT SERVING MIGRATION =====
-db.meta=db.meta||{};db.meta.version=8.1;
+db.meta=db.meta||{};db.meta.version=10;
 db.stalls.forEach(s=>{
   s.order=s.order||{};s.order.items=s.order.items||{};s.order.kitchen=s.order.kitchen||{};
   Object.entries(s.order.items).forEach(([pid,q])=>{
@@ -479,27 +502,48 @@ function renderKitchenDetail(){
     </div>`;
   }).join('');
 }
-function setKitchenStatus(sid,pid,status){
-  let s=stall(sid);if(!s)return;let k=getKitchenState(s,pid);k.status=status;
-  if(status==='pending'&&k.served>=(s.order.items[pid]||0))k.served=0;
-  save();if(kitchenStallId===sid&&$('kitchenDetail').style.display!=='none')renderKitchenDetail();else renderKitchen();if(currentStall===sid&&$('order')?.classList.contains('on'))renderCart();
+
+function refreshKitchenViews(sid){
+  if(kitchenStallId===sid && $('kitchenDetail') && $('kitchenDetail').style.display!=='none') renderKitchenDetail();
+  else renderKitchen();
+  if(currentStall===sid && $('order')?.classList.contains('on')) renderCart();
 }
-function changeServed(sid,pid,d){
-  if(d>0)return markNextUnit(sid,pid);
-  return markPreviousUnit(sid,pid);
-}
-function serveAll(sid,pid){
+function toggleKitchenUnit(sid,pid,index){
   const s=stall(sid);if(!s)return;
   const k=getKitchenState(s,pid);
-  k.units=k.units.map(()=>true);
-  getKitchenState(s,pid);save();if(kitchenStallId===sid)renderKitchenDetail();else renderKitchen();
-  if(currentStall===sid&&$('order')?.classList.contains('on'))renderCart();
+  if(index<0||index>=k.units.length)return;
+  k.units[index]=!k.units[index];
+  getKitchenState(s,pid);save();refreshKitchenViews(sid);
+}
+function markNextUnit(sid,pid){
+  const s=stall(sid);if(!s)return;
+  const k=getKitchenState(s,pid);
+  const i=k.units.findIndex(v=>!v);
+  if(i>=0)k.units[i]=true;
+  getKitchenState(s,pid);save();refreshKitchenViews(sid);
+}
+function markPreviousUnit(sid,pid){
+  const s=stall(sid);if(!s)return;
+  const k=getKitchenState(s,pid);
+  for(let i=k.units.length-1;i>=0;i--){if(k.units[i]){k.units[i]=false;break}}
+  getKitchenState(s,pid);save();refreshKitchenViews(sid);
+}
+
+function setKitchenStatus(sid,pid,status){
+  const s=stall(sid);if(!s)return;const k=getKitchenState(s,pid);
+  if(status==='served')k.units=k.units.map(()=>true);
+  if(status==='pending')k.units=k.units.map(()=>false);
+  getKitchenState(s,pid);save();refreshKitchenViews(sid);
+}
+function changeServed(sid,pid,d){return d>0?markNextUnit(sid,pid):markPreviousUnit(sid,pid)}
+function serveAll(sid,pid){
+  const s=stall(sid);if(!s)return;const k=getKitchenState(s,pid);k.units=k.units.map(()=>true);getKitchenState(s,pid);save();refreshKitchenViews(sid);
 }
 function cancelKitchenItem(sid,pid){
-  let s=stall(sid);if(!s)return;let p=prod(pid);
+  const s=stall(sid);if(!s)return;const p=prod(pid);
   if(!confirm('Hủy '+(p?.name||'món này')+' khỏi bill của '+s.name+'?'))return;
-  delete s.order.items[pid];if(s.order.kitchen)delete s.order.kitchen[pid];
-  save();if(kitchenStallId===sid&&$('kitchenDetail').style.display!=='none')renderKitchenDetail();else renderKitchen();if(currentStall===sid&&$('order')?.classList.contains('on'))renderCart();
+  delete s.order.items[pid];if(s.order.kitchen)delete s.order.kitchen[pid];save();
+  if(kitchenStallId===sid&&!Object.keys(s.order.items||{}).length)closeKitchenStall();else refreshKitchenViews(sid);
 }
 
 function openCheckoutConfirm(){
@@ -530,7 +574,14 @@ function confirmCheckout(){
   closeM('checkoutConfirmModal');
   finalizeCheckout();
 }
-function finalizeCheckout(){let s=stall(currentStall),t=orderTotals(s);if(!t.qty)return alert('Bill chưa có món.');let rent=$('rentChoice').value==='none'?0:Math.max(0,+$('rentAmount').value||0),dis=Math.max(0,+$('discount').value||0),dep=Math.max(0,+$('depositOrder').value||0),rev=Math.max(0,t.sub+rent-dis),due=Math.max(0,rev-dep),items=Object.entries(s.order.items).map(([id,q])=>{let p=prod(id);return{id:p.id,name:p.name,unit:p.unit,qty:q,price:p.price,cost:p.cost}});let b={id:uid('bill'),code:'HD'+String(Date.now()).slice(-7),date:dateKey(),time:new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}),stallId:s.id,stallName:s.name,customer:$('customerOrder').value.trim(),items,kitchenSnapshot:JSON.parse(JSON.stringify(s.order.kitchen||{})),subtotal:t.sub,rent,rentChoice:$('rentChoice').value,discount:dis,deposit:dep,revenue:rev,due,cost:t.cost,updatedAt:Date.now(),pay:$('pay').value,note:$('orderNote').value};db.bills.unshift(b);s.order={};s.status='empty';save();showReceipt(b);renderHome()}
+function finalizeCheckout(){
+ const day=dateKey();if(isDayClosed(day))return alert('Ngày '+day+' đã chốt. Hãy mở lại ngày trước khi tạo thêm bill.');
+ let s=stall(currentStall),t=orderTotals(s);if(!s||!t.qty)return alert('Bill chưa có món.');
+ let rent=$('rentChoice').value==='none'?0:Math.max(0,+$('rentAmount').value||0),dis=Math.max(0,+$('discount').value||0),dep=Math.max(0,+$('depositOrder').value||0),rev=Math.max(0,t.sub+rent-dis),due=Math.max(0,rev-dep);
+ let items=Object.entries(s.order.items).map(([id,q])=>{let p=prod(id);return{id:p.id,name:p.name,unit:p.unit,qty:q,price:p.price}});
+ let b={id:uid('bill'),code:'HD'+String(Date.now()).slice(-7),date:day,time:new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}),stallId:s.id,stallName:s.name,customer:$('customerOrder').value.trim(),items,kitchenSnapshot:JSON.parse(JSON.stringify(s.order.kitchen||{})),subtotal:t.sub,rent,rentChoice:$('rentChoice').value,discount:dis,deposit:dep,revenue:rev,due,updatedAt:Date.now(),pay:$('pay').value,note:$('orderNote').value};
+ db.bills.unshift(b);s.order={};s.status='empty';save();showReceipt(b);renderHome();
+}
 function showReceipt(b){currentReceiptBill=b;let qr=db.settings.qr?`<div class="center"><img src="${db.settings.qr}" style="max-width:145px;border-radius:10px"><div class="muted">${db.settings.bank} · ${db.settings.account}<br>${db.settings.owner}</div></div>`:'';$('receipt').innerHTML=`<h2>THÁC DÊ CAMPING</h2><div class="center"><small>HÓA ĐƠN THANH TOÁN</small><br><b>${b.code}</b><br><small>${b.date} · ${b.time} · ${b.stallName}${b.customer?' · '+b.customer:''}</small></div><div class="dash"></div>${b.items.map(i=>`<div class="r"><span>${i.name} × ${i.qty}</span><b>${money(i.price*i.qty)}</b></div>`).join('')}<div class="dash"></div><div class="r"><span>Tiền món</span><span>${money(b.subtotal)}</span></div>${b.rent?`<div class="r"><span>Tiền sạp (${b.rentChoice==='large'?'Sạp to':b.rentChoice==='small'?'Sạp bé':''})</span><span>${money(b.rent)}</span></div>`:''}${b.discount?`<div class="r"><span>Giảm giá</span><span>-${money(b.discount)}</span></div>`:''}${b.deposit?`<div class="r"><span>Đã cọc</span><span>-${money(b.deposit)}</span></div>`:''}<div class="r total"><span>CÒN TRẢ</span><span>${money(b.due)}</span></div><div class="r"><span>Thanh toán</span><span>${b.pay}</span></div>${b.note?`<small>Ghi chú: ${b.note}</small>`:''}<div class="dash"></div>${qr}<div class="center"><small>Zalo/SĐT: ${db.settings.phone}<br>Cảm ơn quý khách!</small></div>`;$('receiptModal').style.display='flex'}
 function openStallManage(){renderStallManage();$('stallModal').style.display='flex'}function renderStallManage(){$('stallManage').innerHTML=db.stalls.map(s=>`<div class="row"><div><b>${s.name}</b><div class="muted">${s.type==='big'?'Sạp to':'Sạp bé'} · ${money(s.rent)}</div></div><div><button class="btn secondary" onclick="renameStall('${s.id}')">Tên</button> <button class="btn secondary" onclick="toggleType('${s.id}')">Chọn loại</button> <button class="btn red" onclick="deleteStall('${s.id}')">Xóa</button></div></div>`).join('')}
 function toggleInlineAddStall(force){
@@ -594,14 +645,11 @@ function openProduct(id=null){editProduct=id;let p=id?prod(id):null;$('pn').valu
 }
 function openPurchase(){$('buyName').value='';$('buyAmount').value='';$('buyDate').value=dateKey();$('buyNote').value='';$('buyFor').innerHTML='<option value="Dùng chung">Dùng chung</option>'+db.stalls.map(s=>`<option value="${s.name}">${s.name}${s.order?.customer?' · '+s.order.customer:''}</option>`).join('');$('contributors').innerHTML='';addContributor();$('purchaseModal').style.display='flex'}function addContributor(){let d=document.createElement('div');d.className='form2 contributor';d.style.marginBottom='7px';d.innerHTML='<input class="cname" placeholder="Tên người góp"><input class="camount" type="number" placeholder="Số tiền góp">';$('contributors').appendChild(d)}
 function savePurchase(){
- let name=$('buyName').value.trim(),total=+$('buyAmount').value||0;
- if(!name||total<=0)return alert('Nhập nội dung mua và tổng số tiền.');
- let cs=[...document.querySelectorAll('.contributor')].map(x=>({person:x.querySelector('.cname').value.trim(),amount:+x.querySelector('.camount').value||0})).filter(x=>x.person&&x.amount>0);
- if(!cs.length)return alert('Cần ít nhất một người đã bỏ tiền.');
- let paid=cs.reduce((a,x)=>a+x.amount,0);
- if(paid!==total&&!confirm('Tổng người trả '+money(paid)+' khác tổng tiền mua '+money(total)+'. Vẫn lưu?'))return;
- db.purchases.unshift({id:uid('purchase'),date:$('buyDate').value||dateKey(),name,total,buyFor:$('buyFor').value||'Dùng chung',contributors:cs,note:$('buyNote').value.trim(),updatedAt:Date.now()});
- save();closeM('purchaseModal');renderInventory();renderReport();
+ const day=$('buyDate').value||dateKey();if(isDayClosed(day))return alert('Ngày '+day+' đã chốt. Hãy mở lại ngày trước khi ghi nguyên liệu.');
+ let name=$('buyName').value.trim(),total=+$('buyAmount').value||0;if(!name||total<=0)return alert('Nhập nội dung mua và tổng số tiền.');
+ let cs=[...document.querySelectorAll('.contributor')].map(x=>({person:x.querySelector('.cname').value.trim(),amount:+x.querySelector('.camount').value||0})).filter(x=>x.person&&x.amount>0);if(!cs.length)return alert('Cần ít nhất một người đã bỏ tiền.');
+ let paid=cs.reduce((a,x)=>a+x.amount,0);if(paid!==total&&!confirm('Tổng người trả '+money(paid)+' khác tổng tiền mua '+money(total)+'. Vẫn lưu?'))return;
+ db.purchases.unshift({id:uid('purchase'),date:day,name,total,buyFor:$('buyFor').value||'Dùng chung',contributors:cs,note:$('buyNote').value.trim(),updatedAt:Date.now()});save();closeM('purchaseModal');renderInventory();renderReport();
 }
 function inPeriod(date,p){let d=new Date(date+'T12:00:00'),n=new Date();if(p==='day')return date===dateKey(n);if(p==='month')return d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth();if(p==='year')return d.getFullYear()===n.getFullYear();let a=new Date(n);a.setHours(0,0,0,0);a.setDate(a.getDate()-((a.getDay()+6)%7));let z=new Date(a);z.setDate(z.getDate()+7);return d>=a&&d<z}/* V7 removed obsolete duplicate stats */
 
@@ -634,17 +682,18 @@ function updateExpenseTotal(){
   $('expenseItemsTotal').textContent=money([...document.querySelectorAll('.expenseItem .eamount')].reduce((a,x)=>a+(+x.value||0),0));
 }
 function saveExpenseSmart(){
+  const day=expenseView==='investment'?($('investmentDate').value||dateKey()):($('expenseDate').value||dateKey());if(isDayClosed(day))return alert('Ngày '+day+' đã chốt. Hãy mở lại ngày trước khi ghi khoản mới.');
   if(expenseView==='investment'){
     const name=$('investmentName').value.trim(),amount=+$('investmentAmount').value||0,payer=$('investmentPayer').value.trim();
     if(!name||amount<=0)return alert('Nhập nội dung đầu tư và số tiền.');
-    db.investments.unshift({id:uid('investment'),date:$('investmentDate').value||dateKey(),name,category:'Đầu tư',amount,payer,note:$('investmentNote').value.trim(),updatedAt:Date.now()});
+    db.investments.unshift({id:uid('investment'),date:day,name,category:'Đầu tư',amount,payer,note:$('investmentNote').value.trim(),updatedAt:Date.now()});
   }else{
     const payer=$('expensePayer').value.trim();
     const items=[...document.querySelectorAll('.expenseItem')].map(x=>({name:x.querySelector('.ename').value.trim(),amount:+x.querySelector('.eamount').value||0})).filter(x=>x.name&&x.amount>0);
     if(!payer)return alert('Nhập người cầm tiền.');
     if(!items.length)return alert('Thêm ít nhất một món chi phí.');
     const total=items.reduce((a,x)=>a+x.amount,0);
-    db.expenses.unshift({id:uid('expense'),date:$('expenseDate').value||dateKey(),name:items.map(x=>x.name).join(' + '),category:'Chi phí vận hành',amount:total,payer,note:$('expenseNote').value.trim(),items,updatedAt:Date.now()});
+    db.expenses.unshift({id:uid('expense'),date:day,name:items.map(x=>x.name).join(' + '),category:'Chi phí vận hành',amount:total,payer,note:$('expenseNote').value.trim(),items,updatedAt:Date.now()});
   }
   save();closeM('expenseModal');renderExpenses();renderReport();
 }
@@ -652,22 +701,33 @@ function saveExpenseSmart(){
 function renderExpenses(){db.investments=db.investments||[];let et=db.expenses.filter(x=>x.date===dateKey()).reduce((a,x)=>a+x.amount,0),it=db.investments.filter(x=>x.date===dateKey()).reduce((a,x)=>a+x.amount,0);$('eToday').textContent=money(et);$('iToday').textContent=money(it);let arr=expenseView==='expense'?db.expenses:db.investments;$('expenseList').innerHTML=arr.length?arr.slice(0,60).map(x=>`<div class="row"><div><b>${x.name}</b><div class="muted">${x.date} · ${x.category}${x.payer?' · '+x.payer+' trả':''}${x.note?' · '+x.note:''}</div></div><div style="text-align:right"><b>${money(x.amount)}</b><div><button class="link" onclick="deleteExpense('${expenseView}','${x.id}')">Xóa</button></div></div></div>`).join(''):'<div class="center muted" style="padding:18px">Chưa có khoản nào</div>'}
 function deleteExpense(kind,id){if(!confirm('Xóa khoản này?'))return;let k=kind==='expense'?'expenses':'investments';db[k]=db[k].filter(x=>x.id!==id);save();renderExpenses();renderReport()}
 /* V7 removed obsolete duplicate renderReport */
-function renderTimeline(bills){let groups={};bills.forEach(b=>{let key=reportPeriod==='year'?b.date.slice(0,7):b.date;(groups[key]??=[]).push(b)});let max=Math.max(1,...Object.values(groups).map(x=>x.reduce((a,b)=>a+b.revenue,0)));$('timeline').innerHTML=Object.keys(groups).length?Object.keys(groups).sort().reverse().map(k=>{let x=groups[k],rev=x.reduce((a,b)=>a+b.revenue,0),cost=x.reduce((a,b)=>a+b.cost,0);return `<div class="row detailDay" onclick="${reportPeriod==='year'?`openMonth('${k}')`:`openDay('${k}')`}"><div style="flex:1"><b>${reportPeriod==='year'?'Tháng '+k.slice(5,7)+'/'+k.slice(0,4):k}</b><div class="muted">${x.length} bill · Lãi ${money(rev-cost)}</div><div class="bar"><i style="width:${rev/max*100}%"></i></div></div><b>${money(rev)}</b></div>`}).join(''):'<div class="center muted" style="padding:18px">Chưa có dữ liệu</div>'}
+function renderTimeline(){/* V10 obsolete: replaced by renderTimelineV54 */}
 function openMonth(m){let bs=db.bills.filter(b=>b.date.startsWith(m)),groups={};bs.forEach(b=>(groups[b.date]??=[]).push(b));$('dayTitle').textContent='Chi tiết '+m;$('dayBills').innerHTML=Object.keys(groups).sort().map(k=>{let rev=groups[k].reduce((a,b)=>a+b.revenue,0);return `<div class="row" onclick="openDay('${k}')"><div><b>${k}</b><div class="muted">${groups[k].length} bill</div></div><b>${money(rev)}</b></div>`}).join('');$('dayModal').style.display='flex'}function openDay(day){let bs=db.bills.filter(b=>b.date===day);$('dayTitle').textContent='Chi tiết '+day;$('dayBills').innerHTML=bs.length?bs.map(b=>`<div class="row" onclick='showReceipt(${JSON.stringify(b)})'><div><b>${b.stallName}${b.customer?' · '+b.customer:''}</b><div class="muted">${b.time} · ${b.code} · ${b.items.map(i=>i.name+' ×'+i.qty).join(', ')}</div></div><b>${money(b.revenue)}</b></div>`).join(''):'<div class="center muted" style="padding:18px">Không có bill</div>';$('dayModal').style.display='flex'}
 /* V7 removed obsolete duplicate openRecon */function profitShare(){let d=stats('day'),people=[...new Set([...db.purchases.filter(x=>x.date===dateKey()).flatMap(x=>x.contributors.map(c=>c.person)),...db.expenses.filter(x=>x.date===dateKey()&&x.payer).map(x=>x.payer)])];if(!people.length)return alert('Chưa có người để chia.');let each=d.profit/people.length;$('shareResult').innerHTML=people.map(p=>`<div class="row"><b>${p}</b><b>${money(each)}</b></div>`).join('')}
 
 function capitalLedger(){let p={};db.purchases.forEach(x=>x.contributors.forEach(c=>p[c.person]=(p[c.person]||0)+c.amount));db.expenses.forEach(x=>{if(x.payer)p[x.payer]=(p[x.payer]||0)+x.amount});db.repayments.forEach(x=>p[x.person]=(p[x.person]||0)-x.amount);return p}
 function openDebts(){let p=capitalLedger();$('debtList').innerHTML=Object.keys(p).length?Object.entries(p).sort((a,b)=>b[1]-a[1]).map(([n,a])=>`<div class="row"><b>${n}</b><b>${money(a)}</b></div>`).join(''):'<div class="center muted" style="padding:18px">Chưa có công nợ</div>';$('repayDate').value=dateKey();$('repayPerson').value='';$('repayAmount').value='';$('repayNote').value='';$('debtsModal').style.display='flex'}
 function saveRepayment(){let person=$('repayPerson').value.trim(),amount=+$('repayAmount').value||0;if(!person||amount<=0)return alert('Nhập người nhận và số tiền hoàn.');db.repayments.unshift({id:uid('repay'),person,amount,date:$('repayDate').value||dateKey(),note:$('repayNote').value,updatedAt:Date.now()});save();openDebts()}
-function openSettings(){setTimeout(()=>{if($('smallStallPrice'))$('smallStallPrice').value=db.meta.smallStallPrice||200000;if($('largeStallPrice'))$('largeStallPrice').value=db.meta.largeStallPrice||300000},0);let s=db.settings;$('shopName').value=s.shopName;$('shopPhone').value=s.phone;$('bankName').value=s.bank;$('bankAcc').value=s.account;$('bankOwner').value=s.owner;$('settingsModal').style.display='flex'}async function saveSettings(){if($('smallStallPrice'))db.meta.smallStallPrice=+$('smallStallPrice').value||0;if($('largeStallPrice'))db.meta.largeStallPrice=+$('largeStallPrice').value||0;let qr=await fileData($('qrFile').files[0]);Object.assign(db.settings,{shopName:$('shopName').value||'THÁC DÊ CAMPING',phone:$('shopPhone').value,bank:$('bankName').value,account:$('bankAcc').value,owner:$('bankOwner').value,qr:qr||db.settings.qr});save();alert('Đã lưu.')}
-function download(c,n,t){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:t}));a.download=n;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}function exportData(){download(JSON.stringify(db,null,2),'ThacDe-Backup-'+dateKey()+'-'+new Date().toTimeString().slice(0,5).replace(':','')+'.json','application/json')}function mergeArr(local,inc){let m=new Map(local.map(x=>[x.id,x]));inc.forEach(x=>{let old=m.get(x.id);if(!old||(x.updatedAt||0)>=(old.updatedAt||0))m.set(x.id,x)});return [...m.values()]}async function importData(file){if(!file)return;try{let backup=JSON.stringify(db);localStorage.setItem(KEY+'_PRE_IMPORT_BACKUP',backup);let inc=JSON.parse(await file.text());['stalls','products','bills','purchases','expenses','investments','preorders','settlements','repayments'].forEach(k=>db[k]=mergeArr(db[k]||[],inc[k]||[]));if(inc.settings)db.settings={...db.settings,...inc.settings};save();alert('Đã gộp dữ liệu: ID trùng được ghi đè, ID mới được bổ sung.');location.reload()}catch(e){alert('File dữ liệu không hợp lệ.')}}
+function openSettings(){setTimeout(()=>{if($('smallStallPrice'))$('smallStallPrice').value=db.meta.smallStallPrice||200000;if($('largeStallPrice'))$('largeStallPrice').value=db.meta.largeStallPrice||300000},0);let s=db.settings;$('shopName').value=s.shopName;$('shopPhone').value=s.phone;$('bankName').value=s.bank;$('bankAcc').value=s.account;$('bankOwner').value=s.owner;$('settingsModal').style.display='flex'}async function saveSettings(){
+ if($('smallStallPrice'))db.meta.smallStallPrice=+$('smallStallPrice').value||0;if($('largeStallPrice'))db.meta.largeStallPrice=+$('largeStallPrice').value||0;
+ db.stalls.forEach(s=>{s.rent=s.type==='big'?(db.meta.largeStallPrice||300000):(db.meta.smallStallPrice||200000);s.updatedAt=Date.now()});
+ let qr=await fileData($('qrFile').files[0]);Object.assign(db.settings,{shopName:$('shopName').value||'THÁC DÊ CAMPING',phone:$('shopPhone').value,bank:$('bankName').value,account:$('bankAcc').value,owner:$('bankOwner').value,qr:qr||db.settings.qr});save();renderHome();alert('Đã lưu.');
+}
+function download(c,n,t){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:t}));a.download=n;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}function exportData(){download(JSON.stringify(db,null,2),'ThacDe-Backup-'+dateKey()+'-'+new Date().toTimeString().slice(0,5).replace(':','')+'.json','application/json')}function mergeArr(local,inc){let m=new Map(local.map(x=>[x.id,x]));inc.forEach(x=>{let old=m.get(x.id);if(!old||(x.updatedAt||0)>=(old.updatedAt||0))m.set(x.id,x)});return [...m.values()]}async function importData(file){if(!file)return;try{let backup=JSON.stringify(db);localStorage.setItem(KEY+'_PRE_IMPORT_BACKUP',backup);let inc=JSON.parse(await file.text());['stalls','products','bills','purchases','expenses','investments','preorders','settlements','repayments'].forEach(k=>db[k]=mergeArr(db[k]||[],inc[k]||[]));if(inc.settings)db.settings={...db.settings,...inc.settings};if(inc.meta)db.meta={...db.meta,...inc.meta};save();alert('Đã gộp dữ liệu: ID trùng được ghi đè, ID mới được bổ sung.');location.reload()}catch(e){alert('File dữ liệu không hợp lệ.')}}
 function restorePreImport(){let x=localStorage.getItem(KEY+'_PRE_IMPORT_BACKUP');if(!x)return alert('Chưa có bản sao trước khi nhập.');if(confirm('Khôi phục dữ liệu trước lần nhập gần nhất?')){localStorage.setItem(KEY,x);location.reload()}}function exportCSV(){let rows=[['Mã bill','Ngày','Giờ','Sạp','Khách','Doanh thu','Cọc','Còn trả','Thanh toán']];db.bills.forEach(b=>rows.push([b.code,b.date,b.time,b.stallName,b.customer||'',b.revenue,b.deposit,b.due,b.pay]));download('\ufeff'+rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(',')).join('\n'),'bao-cao-'+dateKey()+'.csv','text/csv')}
 
 function openPre(){preItems={};$('preCustomer').value='';$('prePhone').value='';$('preDate').value=dateKey();$('preStart').value='09:00';$('preEnd').value='14:00';$('preDeposit').value='';$('preNote').value='';$('preStalls').innerHTML=db.stalls.map(s=>`<label class="row"><span><b>${s.name}</b><div class="muted">${s.type==='big'?'Sạp to':'Sạp bé'}</div></span><input class="preStallCheck" type="checkbox" value="${s.id}" style="width:auto"></label>`).join('');$('preProducts').innerHTML=db.products.map(p=>`<div class="row"><span>${p.name}</span><input style="width:90px" type="number" min="0" value="0" oninput="preItems['${p.id}']=+this.value||0"></div>`).join('');$('preModal').style.display='flex'}
 function timeOverlap(a1,a2,b1,b2){return a1<b2&&b1<a2}
-function savePreV5(){let customer=$('preCustomer').value.trim(),date=$('preDate').value,start=$('preStart').value,end=$('preEnd').value,ids=[...document.querySelectorAll('.preStallCheck:checked')].map(x=>x.value);if(!customer||!date||!start||!end||!ids.length)return alert('Nhập khách, ngày, giờ và chọn ít nhất 1 sạp.');if(start>=end)return alert('Giờ kết thúc phải sau giờ bắt đầu.');let conflict=db.preorders.find(p=>p.status==='reserved'&&p.date===date&&timeOverlap(start,end,p.start||p.time||'00:00',p.end||'23:59')&&(p.stallIds||[p.stallId]).some(id=>ids.includes(id)));if(conflict)return alert('Bị trùng lịch với '+conflict.customer+' ('+(conflict.stallNames||[conflict.stallName]).join(', ')+').');let names=ids.map(id=>stall(id)?.name).filter(Boolean),o={id:uid('pre'),customer,phone:$('prePhone').value.trim(),date,start,end,time:start,stallIds:ids,stallNames:names,stallId:ids[0],stallName:names[0],deposit:+$('preDeposit').value||0,note:$('preNote').value,items:{...preItems},status:'reserved',updatedAt:Date.now()};db.preorders.unshift(o);ids.forEach(id=>{let s=stall(id);if(s&&s.status==='empty')s.status='reserved'});save();closeM('preModal');renderPreorders();renderHome()}
+function savePreV5(){
+ let customer=$('preCustomer').value.trim(),date=$('preDate').value,start=$('preStart').value,end=$('preEnd').value,ids=[...document.querySelectorAll('.preStallCheck:checked')].map(x=>x.value);
+ if(!customer||!date||!start||!end||!ids.length)return alert('Nhập khách, ngày, giờ và chọn ít nhất 1 sạp.');if(start>=end)return alert('Giờ kết thúc phải sau giờ bắt đầu.');
+ let conflict=db.preorders.find(p=>p.status==='reserved'&&p.date===date&&timeOverlap(start,end,p.start||p.time||'00:00',p.end||'23:59')&&(p.stallIds||[p.stallId]).some(id=>ids.includes(id)));
+ if(conflict)return alert('Bị trùng lịch với '+conflict.customer+' ('+(conflict.stallNames||[conflict.stallName]).join(', ')+').');
+ let names=ids.map(id=>stall(id)?.name).filter(Boolean),o={id:uid('pre'),customer,phone:$('prePhone').value.trim(),date,start,end,time:start,stallIds:ids,stallNames:names,stallId:ids[0],stallName:names[0],deposit:+$('preDeposit').value||0,note:$('preNote').value,items:{...preItems},status:'reserved',updatedAt:Date.now()};
+ db.preorders.unshift(o);save();closeM('preModal');renderPreorders();renderHome();
+}
 function renderPreorders(){let a=[...db.preorders].sort((x,y)=>(x.date+(x.start||x.time||'')).localeCompare(y.date+(y.start||y.time||'')));$('preList').innerHTML=a.length?a.map(p=>`<div class="box precard" style="margin-bottom:9px"><div class="row"><div><b>${p.customer}</b><div class="muted">${p.date} · ${p.start||p.time||''}${p.end?'–'+p.end:''} · ${(p.stallNames||[p.stallName]).join(', ')}</div><div class="muted">${p.phone||''}${p.deposit?' · Cọc '+money(p.deposit):''}</div></div><span class="tag ${p.status==='reserved'?'reserved':'empty'}">${p.status==='reserved'?'Đã đặt':p.status}</span></div>${p.status==='reserved'?`<div class="actions" style="padding:8px"><button class="btn secondary" onclick="cancelPre('${p.id}')">Hủy</button><button class="btn primary" onclick="startPreV5('${p.id}')">Khách đã đến</button></div>`:''}</div>`).join(''):'<div class="box center muted" style="padding:20px">Chưa có đặt trước</div>'}
-function cancelPre(id){let p=db.preorders.find(x=>x.id===id);if(!p)return;p.status='cancelled';(p.stallIds||[p.stallId]).forEach(id=>{let s=stall(id);if(s&&s.status==='reserved')s.status='empty'});save();renderPreorders();renderHome()}
+function cancelPre(id){let p=db.preorders.find(x=>x.id===id);if(!p)return;p.status='cancelled';p.updatedAt=Date.now();save();renderPreorders();renderHome()}
 function startPreV5(id){let p=db.preorders.find(x=>x.id===id),ids=p.stallIds||[p.stallId];p.status='arrived';ids.forEach((id,i)=>{let s=stall(id);if(!s)return;s.status='using';s.order=s.order||{items:{}};s.order.items=s.order.items||{};s.order.customer=p.customer;s.order.deposit=i===0?p.deposit:0;s.order.preorderId=p.id;Object.entries(p.items||{}).forEach(([pid,q])=>{if(q>0&&i===0){s.order.items[pid]=(s.order.items[pid]||0)+q;s.order.kitchen=s.order.kitchen||{};s.order.kitchen[pid]=s.order.kitchen[pid]||{status:'pending',served:0,units:Array(q).fill(false)}}})});save();closeM('preModal');openStall(ids[0])}
 /* V7 removed obsolete duplicate openRecon */
 
@@ -724,6 +784,7 @@ function rawDayData(day){
   expenses.forEach(x=>{if(x.payer)contributors[x.payer]=(contributors[x.payer]||0)+(+x.amount||0)});
   return {day,bills,purchases,expenses,investments,revenue,purchaseCost,operating,investment,profit,cash,transfer,deposits,contributors};
 }
+function isDayClosed(day){return !!getSettlement(day)}
 function getSettlement(day){return db.settlements.find(x=>x.date===day&&x.status==='closed')}
 function dayNumbers(day){
   const s=getSettlement(day);
@@ -801,7 +862,7 @@ function renderDaySettlement(day){
   $('closeDayBtn').style.display=closed?'none':'block';
   $('reopenDayBtn').style.display=closed?'block':'none';
   const contrib=closed?.contributors||raw.contributors;
-  const purchases=raw.purchases, expenses=raw.expenses;
+  const purchases=closed?.purchaseDetails||raw.purchases, expenses=closed?.expenseDetails||raw.expenses;
   $('daySettlementReport').innerHTML=`
     <h2>THÁC DÊ CAMPING</h2><div class="subtitle">BÁO CÁO CHỐT NGÀY · ${day}${closed?' · ĐÃ CHỐT':''}</div>
     <div class="settleTotal">
@@ -836,7 +897,7 @@ function confirmCloseDay(){
   db.settlements.push({
     id:'settle_'+day,date:day,status:'closed',closedAt:Date.now(),updatedAt:Date.now(),
     snapshot:{revenue:r.revenue,purchaseCost:r.purchaseCost,operating:r.operating,investment:r.investment,profit:r.profit,billCount:r.bills.length,cash:r.cash,transfer:r.transfer,deposits:r.deposits},
-    contributors:{...r.contributors}
+    contributors:{...r.contributors},purchaseDetails:JSON.parse(JSON.stringify(r.purchases)),expenseDetails:JSON.parse(JSON.stringify(r.expenses)),investmentDetails:JSON.parse(JSON.stringify(r.investments))
   });
   save();renderDaySettlement(day);renderReport();alert('Đã chốt ngày '+day);
 }
@@ -852,18 +913,26 @@ async function saveDayReportImage(){
 function saveDayReportPDF(){document.body.classList.add('print-day');setTimeout(()=>{window.print();setTimeout(()=>document.body.classList.remove('print-day'),700)},50)}
 window.addEventListener('afterprint',()=>document.body.classList.remove('print-day'));
 function exportDayCSV(){
-  const day=$('settleDate').value||dateKey(),r=rawDayData(day),rows=[
-    ['THÁC DÊ CAMPING - CHỐT NGÀY',day],
-    ['Doanh thu',r.revenue],['Nguyên liệu / hàng bán',r.purchaseCost],['Chi phí vận hành',r.operating],['Lợi nhuận về tay',r.profit],['Đầu tư (riêng)',r.investment],[],
-    ['NGƯỜI ỨNG','SỐ TIỀN'],...Object.entries(r.contributors),[],
-    ['MUA HÀNG','GẮN VỚI','SỐ TIỀN','NGƯỜI TRẢ'],
-    ...r.purchases.map(x=>[x.name||x.productName||'Mua hàng',x.buyFor||'Dùng chung',x.total||x.amount,(x.contributors||[]).map(c=>c.person+': '+c.amount).join(' | ')]),[],
-    ['CHI PHÍ','LOẠI','SỐ TIỀN','NGƯỜI TRẢ'],
-    ...r.expenses.map(x=>[x.name,x.category||'',x.amount,x.payer||''])
-  ];
-  download('\ufeff'+rows.map(row=>row.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\n'),'Thac-De-Camping-Chot-Ngay-'+day+'.csv','text/csv;charset=utf-8');
+ const day=$('settleDate').value||dateKey(),closed=getSettlement(day),raw=rawDayData(day),n=closed?.snapshot||{revenue:raw.revenue,purchaseCost:raw.purchaseCost,operating:raw.operating,investment:raw.investment,profit:raw.profit},contributors=closed?.contributors||raw.contributors,purchases=closed?.purchaseDetails||raw.purchases,expenses=closed?.expenseDetails||raw.expenses;
+ const rows=[['THÁC DÊ CAMPING - CHỐT NGÀY',day],['Doanh thu',n.revenue],['Nguyên liệu / hàng bán',n.purchaseCost],['Chi phí vận hành',n.operating],['Lợi nhuận về tay',n.profit],['Đầu tư (riêng)',n.investment],[],['NGƯỜI ỨNG','SỐ TIỀN'],...Object.entries(contributors),[],['NGUYÊN LIỆU / HÀNG BÁN','GẮN VỚI','SỐ TIỀN','NGƯỜI TRẢ'],...purchases.map(x=>[x.name||'Mua hàng',x.buyFor||'Dùng chung',x.total||x.amount,(x.contributors||[]).map(c=>c.person+': '+c.amount).join(' | ')]),[],['CHI PHÍ','LOẠI','SỐ TIỀN','NGƯỜI TRẢ'],...expenses.map(x=>[x.name,x.category||'',x.amount,x.payer||''])];
+ download('\ufeff'+rows.map(row=>row.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\n'),'Thac-De-Camping-Chot-Ngay-'+day+'.csv','text/csv;charset=utf-8');
 }
 function openRecon(){openDaySettlement(dateKey())}
+
+
+function __v83SmokeTest(){
+  const result={ok:true,checks:[]};
+  const ck=(name,cond)=>{result.checks.push({name,ok:!!cond});if(!cond)result.ok=false};
+  try{
+    ck('db arrays',Array.isArray(db.stalls)&&Array.isArray(db.products)&&Array.isArray(db.bills)&&Array.isArray(db.purchases)&&Array.isArray(db.expenses));
+    ck('financial stats',typeof stats==='function'&&typeof rawDayData==='function');
+    ck('kitchen functions',typeof getKitchenState==='function'&&typeof toggleKitchenUnit==='function'&&typeof markNextUnit==='function'&&typeof markPreviousUnit==='function'&&typeof serveAll==='function');
+    ck('checkout confirm',typeof openCheckoutConfirm==='function'&&typeof confirmCheckout==='function');
+    ck('backup/import',typeof exportData==='function'&&typeof importData==='function');
+    ck('daily closing',typeof openDaySettlement==='function'&&typeof confirmCloseDay==='function');
+  }catch(e){result.ok=false;result.error=String(e)}
+  return result;
+}
 
 renderHome();
 </script>
@@ -917,6 +986,16 @@ async function installPwaApp(){
   }
   // Fallback if browser doesn't expose beforeinstallprompt.
   alert('Nếu chưa thấy hộp cài: trong Chrome bấm ⋮ → “Thêm vào màn hình chính” hoặc “Cài đặt ứng dụng”. Trên iPhone: mở bằng Safari → Chia sẻ → Thêm vào Màn hình chính.');
+}
+</script>
+<script>
+window.addEventListener('error',e=>{console.error('ThacDe runtime error:',e.error||e.message)});
+window.addEventListener('unhandledrejection',e=>{console.error('ThacDe promise error:',e.reason)});
+
+function __runCoreSelfTest(){
+  const f=['renderHome','renderPreorders','renderKitchen','openKitchenStall','renderKitchenDetail','toggleKitchenUnit','markNextUnit','markPreviousUnit','serveAll','openCheckoutConfirm','confirmCheckout','openPurchase','savePurchase','openExpense','saveExpenseSmart','renderReport','openDaySettlement','exportData','importData'];
+  const missing=f.filter(n=>typeof globalThis[n]!=='function'&&eval('typeof '+n)!=='function');
+  return {ok:missing.length===0,missing};
 }
 </script>
 </body></html>

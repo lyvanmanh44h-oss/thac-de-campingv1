@@ -1,11 +1,10 @@
-THÁC DÊ CAMPING V8.1 STABLE — PWA OFFLINE
+THÁC DÊ CAMPING V10 STABLE QA
 
-Nâng cấp Bếp/Lên món:
-- Một món số lượng nhiều được tách thành từng đơn vị riêng để đánh dấu.
-- Ví dụ Gà nướng ×3: Con 1 / Con 2 / Con 3.
-- Có thể bấm trực tiếp từng đơn vị để chuyển Đã lên / Chưa lên.
-- Vẫn giữ + Lên 1 / - 1 đã lên / Lên đủ.
-- Trạng thái tổng vẫn tự tính Đã lên X/Y.
-
-Các chức năng V8 khác giữ nguyên.
-Upload đè 5 file lên GitHub Pages: index.html, manifest.webmanifest, sw.js, icon-192.png, icon-512.png.
+Các sửa lỗi nền thêm ngoài V9:
+- Sạp to nhận đúng giá sạp to (type=big -> large).
+- Xóa logic giá vốn/tồn kho còn sót khỏi order/bill.
+- Đặt trước tương lai không khóa sạp hiện tại; Home chỉ hiển thị lịch sắp tới.
+- Đổi giá sạp trong Cài đặt cập nhật các sạp hiện có.
+- Ngày đã Chốt sẽ khóa tạo bill/nguyên liệu/chi phí/đầu tư cho tới khi Mở lại.
+- Snapshot Chốt ngày giữ cả chi tiết nguyên liệu/chi phí để lịch sử không đổi.
+- Import dữ liệu gộp cả cấu hình meta (giá sạp).
