@@ -62,6 +62,11 @@
 </style>
 </head><body><div class="app">
 <div class="head"><div class="brand">🏖️ Thác Dê Camping</div><button class="iconbtn" onclick="openSettings()">⚙️</button></div>
+<div id="installPwaBar" style="display:none;margin:10px 0 0">
+  <button id="installPwaBtn" class="btn primary full" onclick="installPwaApp()">📲 Cài Thác Dê Camping</button>
+  <div class="muted center" style="margin-top:5px">Cài ra màn hình chính và mở như một ứng dụng.</div>
+</div>
+
 
 <section id="home" class="page on"><div class="hero"><div class="small">Doanh thu hôm nay</div><div class="num" id="todayRev">0 ₫</div><div class="heroGrid"><div class="heroBox"><span class="small">Lợi nhuận thực</span><b id="todayProfit">0 ₫</b></div><div class="heroBox"><span class="small">Bill / Đặt trước</span><b><span id="todayBills">0</span> / <span id="preCount">0</span></b></div></div></div>
 <div class="section"><div class="titlebar"><div class="title">Đặt trước tiếp theo</div><button class="link" onclick="show('preorders')">Xem lịch</button></div><div id="nextPre" class="box"></div></div><div class="section"><div class="titlebar"><div class="title">Sạp & trạng thái</div><button class="link" onclick="openStallManage()">Quản lý sạp</button></div><div id="stallGrid" class="grid2"></div></div></section>
@@ -73,7 +78,7 @@
 
 <section id="preorders" class="page"><div class="titlebar"><div class="title">Đặt trước</div><button class="link" onclick="openPre()">+ Tạo đặt trước</button></div><div id="preList"></div></section>
 
-<section id="inventory" class="page"><div class="titlebar"><div class="title">Danh mục món & mua hàng thực tế</div><button class="link" onclick="openProduct()">+ Sản phẩm</button></div><div id="prodList" class="products"></div><div class="section"><div class="titlebar"><div class="title">Các khoản mua gần đây</div><button class="link" onclick="openPurchase()">+ Ghi mua hàng</button></div><div class="muted" style="margin:-2px 0 8px">Ghi số tiền thực tế đã mua cho khách/sạp để tính lợi nhuận và biết ai đã ứng tiền.</div><div id="purchaseList" class="box"></div></div></section>
+<section id="inventory" class="page"><div class="titlebar"><div class="title">Danh mục món & mua hàng thực tế</div><button class="link" onclick="openProduct()">+ Sản phẩm</button></div><div id="prodList" class="products"></div><div class="section"><div class="titlebar"><div class="title">Các khoản mua gần đây</div><button class="link" onclick="openPurchase()">+ Ghi nguyên liệu</button></div><div class="muted" style="margin:-2px 0 8px">Ghi số tiền thực tế đã mua cho khách/sạp để tính lợi nhuận và biết ai đã ứng tiền.</div><div id="purchaseList" class="box"></div></div></section>
 
 
 <section id="expenses" class="page">
@@ -109,7 +114,7 @@
 
 
 <div id="moreModal" class="modal"><div class="sheet"><h3>Thêm</h3>
-<div class="grid2"><button class="btn secondary" onclick="closeM('moreModal');show('inventory');renderInventory()">🛒 Mua hàng & món</button>
+<div class="grid2"><button class="btn secondary" onclick="closeM('moreModal');show('inventory');renderInventory()">🛒 Nguyên liệu / hàng bán</button>
 <button class="btn secondary" onclick="closeM('moreModal');expenseView='expense';show('expenses');renderExpenses()">💸 Chi phí</button>
 <button class="btn secondary" onclick="closeM('moreModal');expenseView='investment';show('expenses');renderExpenses()">🏗️ Đầu tư</button>
 <button class="btn secondary" onclick="closeM('moreModal');openRecon()">🧮 Đối soát</button>
@@ -175,7 +180,7 @@
 </div>
 <div class="actions" style="margin-top:9px"><button class="btn secondary" onclick="closeM('productModal')">Hủy</button><button class="btn primary" onclick="saveProduct()">Lưu</button></div>
 </div></div>
-<div id="purchaseModal" class="modal"><div class="sheet"><h3>Ghi mua hàng thực tế</h3>
+<div id="purchaseModal" class="modal"><div class="sheet"><h3>Ghi nguyên liệu thực tế</h3>
 <div class="form2"><input id="buyName" class="wide" placeholder="Mua gì? VD: gà, cá, rau, nước đá..."><input id="buyAmount" type="number" placeholder="Tổng tiền"><input id="buyDate" type="date"><select id="buyFor"><option value="Dùng chung">Dùng chung</option></select><textarea id="buyNote" class="wide" placeholder="Ghi chú"></textarea></div>
 <div class="sectionHead">Người đã bỏ tiền</div><div id="contributors"></div><button class="btn secondary full" onclick="addContributor()">+ Thêm người</button>
 <div class="warn" style="margin-top:9px">Khoản này được tính vào chi phí mua hàng thực tế. Có thể nhiều người cùng trả.</div>
@@ -270,6 +275,8 @@ function applyRentChoice(){let c=$('rentChoice').value;$('rentAmount').value=c==
 function saveOpenOrder(){let s=stall(currentStall);s.order.kitchen=s.order.kitchen||{};s.order.customer=$('customerOrder').value.trim();s.order.deposit=+$('depositOrder').value||0;s.order.note=$('orderNote').value;s.order.pay=$('pay').value;s.order.discount=+$('discount').value||0;s.order.rentChoice=$('rentChoice').value;s.order.rentAmount=+$('rentAmount').value||0;if(s.status==='empty')s.status='using';save();show('home')}
 
 
+// ===== V7 CLEAN MIGRATION =====
+db.meta=db.meta||{};db.meta.version=7;db.meta.appName='Thác Dê Camping';
 function kitchenTab(b){document.querySelectorAll('#kitchen .tabs button').forEach(x=>x.classList.remove('on'));b.classList.add('on')}
 function getKitchenState(s,pid){
   s.order=s.order||{};s.order.kitchen=s.order.kitchen||{};
@@ -286,26 +293,24 @@ function unfinishedForStall(s){
 function renderKitchen(){
   const active=db.stalls.filter(s=>Object.keys(s.order?.items||{}).length);
   const filtered=kitchenFilter==='active'?active.filter(s=>unfinishedForStall(s)>0):active;
-  let pending=0,cooking=0,served=0;
+  let waiting=0,partial=0,done=0;
   active.forEach(s=>Object.entries(s.order.items||{}).forEach(([pid,q])=>{
     let k=getKitchenState(s,pid);
-    if(k.served>=q)served++;else if(k.status==='cooking')cooking++;else pending++;
+    if(k.served>=q)done++;else if(k.served>0)partial++;else waiting++;
   }));
-  if($('kitchenSummary'))$('kitchenSummary').innerHTML=`<div class="kpi"><span>CHƯA LÀM / CHƯA ĐỦ</span><b>${pending}</b></div><div class="kpi"><span>ĐANG LÀM</span><b>${cooking}</b></div><div class="kpi"><span>ĐÃ LÊN ĐỦ</span><b>${served}</b></div><div class="kpi"><span>SẠP ĐANG CÓ MÓN</span><b>${active.length}</b></div>`;
+  if($('kitchenSummary'))$('kitchenSummary').innerHTML=`<div class="kpi"><span>CHƯA LÊN</span><b>${waiting}</b></div><div class="kpi"><span>ĐANG LÊN</span><b>${partial}</b></div><div class="kpi"><span>ĐÃ ĐỦ</span><b>${done}</b></div><div class="kpi"><span>SẠP CÓ MÓN</span><b>${active.length}</b></div>`;
   if(!$('kitchenList'))return;
-  const emptyText=kitchenFilter==='active'?'🎉 Không còn món nào chờ lên':'Chưa có sạp nào có món';
+  const emptyText=kitchenFilter==='active'?'🎉 Tất cả món đã lên đủ':'Chưa có sạp nào có món';
   $('kitchenList').innerHTML=filtered.length?filtered.map(s=>{
     let customer=s.order?.customer?` · ${s.order.customer}`:'',u=unfinishedForStall(s);
-    return `<div class="kitchenCard"><div class="kitchenHead"><div><b>${s.name}${customer}</b><div class="muted">${u?u+' phần/món chưa lên đủ':'Đã lên đủ toàn bộ'}</div></div><button class="link" onclick="currentStall='${s.id}';openStall('${s.id}')">Mở sạp</button></div>
-      ${Object.entries(s.order.items||{}).map(([pid,q])=>{
-        let p=prod(pid),k=getKitchenState(s,pid),pct=q?Math.min(100,(k.served/q)*100):0;
-        let cls=k.served>=q?'kServed':k.status==='cooking'?'kCooking':'kPending';
-        let txt=k.served>=q?'Đã lên đủ':k.status==='cooking'?'Đang làm':'Chưa làm';
-        return `<div class="kitchenItem"><div class="titlebar"><div><b>${p?.name||'Món'}</b><div class="muted">${q} ${p?.unit||'phần'} · đã lên ${k.served}/${q}</div></div><span class="kStatus ${cls}">${txt}</span></div><div class="kProgress"><i style="width:${pct}%"></i></div>
-          <div class="kActions"><button class="btn secondary" onclick="setKitchenStatus('${s.id}','${pid}','pending')">⏳ Chưa làm</button><button class="btn secondary" onclick="setKitchenStatus('${s.id}','${pid}','cooking')">🔥 Đang làm</button><button class="btn green" onclick="serveAll('${s.id}','${pid}')">✅ Lên đủ</button></div>
-          <div class="kActions"><button class="btn secondary" onclick="changeServed('${s.id}','${pid}',-1)">− Đã lên</button><button class="btn secondary" onclick="changeServed('${s.id}','${pid}',1)">+ Đã lên</button><button class="btn red" onclick="cancelKitchenItem('${s.id}','${pid}')">Hủy món</button></div>
-        </div>`;
-      }).join('')}</div>`;
+    return `<div class="kitchenCard"><div class="kitchenHead"><div><b>${s.name}${customer}</b><div class="muted">${u?u+' phần chưa lên':'Đã lên đủ toàn bộ'}</div></div><button class="link" onclick="currentStall='${s.id}';openStall('${s.id}')">Mở sạp</button></div>
+    ${Object.entries(s.order.items||{}).map(([pid,q])=>{
+      let p=prod(pid),k=getKitchenState(s,pid),pct=q?Math.min(100,(k.served/q)*100):0;
+      let cls=k.served>=q?'kServed':k.served>0?'kCooking':'kPending',txt=k.served>=q?'Đã lên đủ':k.served>0?'Đang lên':'Chưa lên';
+      return `<div class="kitchenItem"><div class="titlebar"><div><b>${p?.name||'Món'}</b><div class="muted">${q} ${p?.unit||'phần'} · đã lên ${k.served}/${q}</div></div><span class="kStatus ${cls}">${txt}</span></div><div class="kProgress"><i style="width:${pct}%"></i></div>
+      <div class="kActions"><button class="btn secondary" onclick="changeServed('${s.id}','${pid}',-1)">−</button><button class="btn primary" onclick="changeServed('${s.id}','${pid}',1)">+ Lên món</button><button class="btn green" onclick="serveAll('${s.id}','${pid}')">✓ Lên đủ</button></div>
+      <button class="link" style="margin-top:7px" onclick="cancelKitchenItem('${s.id}','${pid}')">Hủy món</button></div>`;
+    }).join('')}</div>`;
   }).join(''):`<div class="box center muted" style="padding:24px">${emptyText}</div>`;
   save();
 }
@@ -317,7 +322,7 @@ function setKitchenStatus(sid,pid,status){
 function changeServed(sid,pid,d){
   let s=stall(sid);if(!s)return;let q=+(s.order.items?.[pid]||0),k=getKitchenState(s,pid);
   k.served=Math.max(0,Math.min(q,(k.served||0)+d));
-  k.status=k.served>=q?'served':(k.served>0?'cooking':k.status==='served'?'pending':k.status);
+  k.status=k.served>=q?'served':(k.served>0?'cooking':'pending');
   save();renderKitchen();if(currentStall===sid&&$('order')?.classList.contains('on'))renderCart();
 }
 function serveAll(sid,pid){
@@ -413,7 +418,7 @@ function savePurchase(){
  db.purchases.unshift({id:uid('purchase'),date:$('buyDate').value||dateKey(),name,total,buyFor:$('buyFor').value||'Dùng chung',contributors:cs,note:$('buyNote').value.trim(),updatedAt:Date.now()});
  save();closeM('purchaseModal');renderInventory();renderReport();
 }
-function inPeriod(date,p){let d=new Date(date+'T12:00:00'),n=new Date();if(p==='day')return date===dateKey(n);if(p==='month')return d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth();if(p==='year')return d.getFullYear()===n.getFullYear();let a=new Date(n);a.setHours(0,0,0,0);a.setDate(a.getDate()-((a.getDay()+6)%7));let z=new Date(a);z.setDate(z.getDate()+7);return d>=a&&d<z}function stats(p){let bills=db.bills.filter(b=>inPeriod(b.date,p)),ex=db.expenses.filter(e=>inPeriod(e.date,p)),rev=bills.reduce((a,b)=>a+b.revenue,0),cost=bills.reduce((a,b)=>a+b.cost,0),expense=ex.reduce((a,e)=>a+e.amount,0);return{bills,rev,cost,expense,profit:rev-cost-expense}}
+function inPeriod(date,p){let d=new Date(date+'T12:00:00'),n=new Date();if(p==='day')return date===dateKey(n);if(p==='month')return d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth();if(p==='year')return d.getFullYear()===n.getFullYear();let a=new Date(n);a.setHours(0,0,0,0);a.setDate(a.getDate()-((a.getDay()+6)%7));let z=new Date(a);z.setDate(z.getDate()+7);return d>=a&&d<z}/* V7 removed obsolete duplicate stats */
 
 function tabExpense(b){document.querySelectorAll('#expenses .tabs button').forEach(x=>x.classList.remove('on'));b.classList.add('on')}
 function openExpense(){$('expenseKind').value=expenseView;$('expenseDate').value=dateKey();$('expenseName').value='';$('expenseAmount').value='';$('expensePayer').value='';$('expenseNote').value='';toggleExpenseKind();$('expenseModal').style.display='flex'}
@@ -421,10 +426,10 @@ function toggleExpenseKind(){let inv=$('expenseKind').value==='investment';$('ex
 function saveExpense(){let kind=$('expenseKind').value,name=$('expenseName').value.trim(),amount=+$('expenseAmount').value||0,payer=$('expensePayer').value.trim();if(!name||amount<=0)return alert('Nhập nội dung và số tiền.');let x={id:uid(kind==='expense'?'expense':'investment'),date:$('expenseDate').value||dateKey(),name,category:$('expenseCategory').value,amount,payer,note:$('expenseNote').value};if(kind==='expense')db.expenses.unshift(x);else{db.investments=db.investments||[];db.investments.unshift(x)}save();expenseView=kind;closeM('expenseModal');renderExpenses();renderReport()}
 function renderExpenses(){db.investments=db.investments||[];let et=db.expenses.filter(x=>x.date===dateKey()).reduce((a,x)=>a+x.amount,0),it=db.investments.filter(x=>x.date===dateKey()).reduce((a,x)=>a+x.amount,0);$('eToday').textContent=money(et);$('iToday').textContent=money(it);let arr=expenseView==='expense'?db.expenses:db.investments;$('expenseList').innerHTML=arr.length?arr.slice(0,60).map(x=>`<div class="row"><div><b>${x.name}</b><div class="muted">${x.date} · ${x.category}${x.payer?' · '+x.payer+' trả':''}${x.note?' · '+x.note:''}</div></div><div style="text-align:right"><b>${money(x.amount)}</b><div><button class="link" onclick="deleteExpense('${expenseView}','${x.id}')">Xóa</button></div></div></div>`).join(''):'<div class="center muted" style="padding:18px">Chưa có khoản nào</div>'}
 function deleteExpense(kind,id){if(!confirm('Xóa khoản này?'))return;let k=kind==='expense'?'expenses':'investments';db[k]=db[k].filter(x=>x.id!==id);save();renderExpenses();renderReport()}
-function renderReport(){let d=stats(reportPeriod);$('rRev').textContent=money(d.rev);$('rCost').textContent=money(d.cost);$('rExp').textContent=money(d.expense);$('rProfit').textContent=money(d.profit);$('rBills').textContent=d.bills.length;$('rMargin').textContent=(d.rev?d.profit/d.rev*100:0).toFixed(1)+'%';let sold={};d.bills.forEach(b=>b.items.forEach(i=>sold[i.name]=(sold[i.name]||0)+i.qty));$('soldList').innerHTML=Object.keys(sold).length?Object.entries(sold).sort((a,b)=>b[1]-a[1]).map(([n,q])=>`<div class="row"><b>${n}</b><span>${q}</span></div>`).join(''):'<div class="center muted" style="padding:18px">Chưa có dữ liệu</div>';let cash=d.bills.filter(b=>b.pay==='Tiền mặt').reduce((a,b)=>a+b.due,0),transfer=d.bills.filter(b=>b.pay==='Chuyển khoản').reduce((a,b)=>a+b.due,0);$('paySplit').innerHTML=`<div class="row"><span>💵 Tiền mặt thực thu khi chốt</span><b>${money(cash)}</b></div><div class="row"><span>🏦 Chuyển khoản thực thu khi chốt</span><b>${money(transfer)}</b></div>`;renderTimeline(d.bills)}
+/* V7 removed obsolete duplicate renderReport */
 function renderTimeline(bills){let groups={};bills.forEach(b=>{let key=reportPeriod==='year'?b.date.slice(0,7):b.date;(groups[key]??=[]).push(b)});let max=Math.max(1,...Object.values(groups).map(x=>x.reduce((a,b)=>a+b.revenue,0)));$('timeline').innerHTML=Object.keys(groups).length?Object.keys(groups).sort().reverse().map(k=>{let x=groups[k],rev=x.reduce((a,b)=>a+b.revenue,0),cost=x.reduce((a,b)=>a+b.cost,0);return `<div class="row detailDay" onclick="${reportPeriod==='year'?`openMonth('${k}')`:`openDay('${k}')`}"><div style="flex:1"><b>${reportPeriod==='year'?'Tháng '+k.slice(5,7)+'/'+k.slice(0,4):k}</b><div class="muted">${x.length} bill · Lãi ${money(rev-cost)}</div><div class="bar"><i style="width:${rev/max*100}%"></i></div></div><b>${money(rev)}</b></div>`}).join(''):'<div class="center muted" style="padding:18px">Chưa có dữ liệu</div>'}
 function openMonth(m){let bs=db.bills.filter(b=>b.date.startsWith(m)),groups={};bs.forEach(b=>(groups[b.date]??=[]).push(b));$('dayTitle').textContent='Chi tiết '+m;$('dayBills').innerHTML=Object.keys(groups).sort().map(k=>{let rev=groups[k].reduce((a,b)=>a+b.revenue,0);return `<div class="row" onclick="openDay('${k}')"><div><b>${k}</b><div class="muted">${groups[k].length} bill</div></div><b>${money(rev)}</b></div>`}).join('');$('dayModal').style.display='flex'}function openDay(day){let bs=db.bills.filter(b=>b.date===day);$('dayTitle').textContent='Chi tiết '+day;$('dayBills').innerHTML=bs.length?bs.map(b=>`<div class="row" onclick='showReceipt(${JSON.stringify(b)})'><div><b>${b.stallName}${b.customer?' · '+b.customer:''}</b><div class="muted">${b.time} · ${b.code} · ${b.items.map(i=>i.name+' ×'+i.qty).join(', ')}</div></div><b>${money(b.revenue)}</b></div>`).join(''):'<div class="center muted" style="padding:18px">Không có bill</div>';$('dayModal').style.display='flex'}
-function openRecon(){let d=stats('day');$('qRev').textContent=money(d.rev);$('qProfit').textContent=money(d.profit);let people=capitalLedger();$('peopleCapital').innerHTML=Object.keys(people).length?Object.entries(people).map(([p,a])=>`<div class="row"><b>${p}</b><b>${money(a)}</b></div>`).join(''):'<div class="center muted" style="padding:18px">Chưa ghi nhận công nợ</div>';$('shareResult').innerHTML='';$('reconModal').style.display='flex'}function profitShare(){let d=stats('day'),people=[...new Set([...db.purchases.filter(x=>x.date===dateKey()).flatMap(x=>x.contributors.map(c=>c.person)),...db.expenses.filter(x=>x.date===dateKey()&&x.payer).map(x=>x.payer)])];if(!people.length)return alert('Chưa có người để chia.');let each=d.profit/people.length;$('shareResult').innerHTML=people.map(p=>`<div class="row"><b>${p}</b><b>${money(each)}</b></div>`).join('')}
+/* V7 removed obsolete duplicate openRecon */function profitShare(){let d=stats('day'),people=[...new Set([...db.purchases.filter(x=>x.date===dateKey()).flatMap(x=>x.contributors.map(c=>c.person)),...db.expenses.filter(x=>x.date===dateKey()&&x.payer).map(x=>x.payer)])];if(!people.length)return alert('Chưa có người để chia.');let each=d.profit/people.length;$('shareResult').innerHTML=people.map(p=>`<div class="row"><b>${p}</b><b>${money(each)}</b></div>`).join('')}
 
 function capitalLedger(){let p={};db.purchases.forEach(x=>x.contributors.forEach(c=>p[c.person]=(p[c.person]||0)+c.amount));db.expenses.forEach(x=>{if(x.payer)p[x.payer]=(p[x.payer]||0)+x.amount});db.repayments.forEach(x=>p[x.person]=(p[x.person]||0)-x.amount);return p}
 function openDebts(){let p=capitalLedger();$('debtList').innerHTML=Object.keys(p).length?Object.entries(p).sort((a,b)=>b[1]-a[1]).map(([n,a])=>`<div class="row"><b>${n}</b><b>${money(a)}</b></div>`).join(''):'<div class="center muted" style="padding:18px">Chưa có công nợ</div>';$('repayDate').value=dateKey();$('repayPerson').value='';$('repayAmount').value='';$('repayNote').value='';$('debtsModal').style.display='flex'}
@@ -439,7 +444,7 @@ function savePreV5(){let customer=$('preCustomer').value.trim(),date=$('preDate'
 function renderPreorders(){let a=[...db.preorders].sort((x,y)=>(x.date+(x.start||x.time||'')).localeCompare(y.date+(y.start||y.time||'')));$('preList').innerHTML=a.length?a.map(p=>`<div class="box precard" style="margin-bottom:9px"><div class="row"><div><b>${p.customer}</b><div class="muted">${p.date} · ${p.start||p.time||''}${p.end?'–'+p.end:''} · ${(p.stallNames||[p.stallName]).join(', ')}</div><div class="muted">${p.phone||''}${p.deposit?' · Cọc '+money(p.deposit):''}</div></div><span class="tag ${p.status==='reserved'?'reserved':'empty'}">${p.status==='reserved'?'Đã đặt':p.status}</span></div>${p.status==='reserved'?`<div class="actions" style="padding:8px"><button class="btn secondary" onclick="cancelPre('${p.id}')">Hủy</button><button class="btn primary" onclick="startPreV5('${p.id}')">Khách đã đến</button></div>`:''}</div>`).join(''):'<div class="box center muted" style="padding:20px">Chưa có đặt trước</div>'}
 function cancelPre(id){let p=db.preorders.find(x=>x.id===id);if(!p)return;p.status='cancelled';(p.stallIds||[p.stallId]).forEach(id=>{let s=stall(id);if(s&&s.status==='reserved')s.status='empty'});save();renderPreorders();renderHome()}
 function startPreV5(id){let p=db.preorders.find(x=>x.id===id),ids=p.stallIds||[p.stallId];p.status='arrived';ids.forEach((id,i)=>{let s=stall(id);if(!s)return;s.status='using';s.order=s.order||{items:{}};s.order.items=s.order.items||{};s.order.customer=p.customer;s.order.deposit=i===0?p.deposit:0;s.order.preorderId=p.id;Object.entries(p.items||{}).forEach(([pid,q])=>{if(q>0&&i===0){s.order.items[pid]=(s.order.items[pid]||0)+q;s.order.kitchen=s.order.kitchen||{};s.order.kitchen[pid]=s.order.kitchen[pid]||{status:'pending',served:0}}})});save();closeM('preModal');openStall(ids[0])}
-function openRecon(){let d=stats('day'),today=dateKey();$('qRev').textContent=money(d.rev);$('qProfit').textContent=money(d.profit);let todayBills=d.bills,depositPrior=todayBills.reduce((a,b)=>a+(+b.deposit||0),0),cash=todayBills.filter(b=>b.pay==='Tiền mặt').reduce((a,b)=>a+(+b.due||0),0),transfer=todayBills.filter(b=>b.pay==='Chuyển khoản').reduce((a,b)=>a+(+b.due||0),0),repaid=db.repayments.filter(x=>x.date===today).reduce((a,x)=>a+(+x.amount||0),0);$('cashRecon').innerHTML=`<div class="row"><span>Tiền mặt thu khi chốt</span><b>${money(cash)}</b></div><div class="row"><span>Chuyển khoản thu khi chốt</span><b>${money(transfer)}</b></div><div class="row"><span>Cọc đã ghi trên bill</span><b>${money(depositPrior)}</b></div><div class="row"><span>Hoàn vốn hôm nay</span><b>${money(repaid)}</b></div>`;let cap={};d.purchases.forEach(x=>(x.contributors||[]).forEach(c=>cap[c.person]=(cap[c.person]||0)+(+c.amount||0)));db.expenses.filter(x=>x.date===today&&x.payer).forEach(x=>cap[x.payer]=(cap[x.payer]||0)+(+x.amount||0));$('peopleCapital').innerHTML=Object.keys(cap).length?Object.entries(cap).map(([n,v])=>`<div class="row"><span>${n}</span><b>${money(v)}</b></div>`).join(''):'<div class="center muted" style="padding:14px">Chưa có ai ứng tiền hôm nay</div>';$('reconModal').style.display='flex'}
+/* V7 removed obsolete duplicate openRecon */
 
 
 
@@ -654,5 +659,39 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:' && location.pr
     console.info('PWA install/offline cache requires HTTPS or localhost. The app itself can still run locally.');
   }
 })();
+</script>
+<script>
+// ===== V6.1 PWA INSTALL BUTTON =====
+let deferredPwaPrompt=null;
+
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();
+  deferredPwaPrompt=e;
+  const bar=document.getElementById('installPwaBar');
+  if(bar)bar.style.display='block';
+});
+
+window.addEventListener('appinstalled',()=>{
+  deferredPwaPrompt=null;
+  const bar=document.getElementById('installPwaBar');
+  if(bar)bar.style.display='none';
+});
+
+async function installPwaApp(){
+  if(deferredPwaPrompt){
+    deferredPwaPrompt.prompt();
+    try{
+      const choice=await deferredPwaPrompt.userChoice;
+      if(choice&&choice.outcome==='accepted'){
+        const bar=document.getElementById('installPwaBar');
+        if(bar)bar.style.display='none';
+      }
+    }catch(e){}
+    deferredPwaPrompt=null;
+    return;
+  }
+  // Fallback if browser doesn't expose beforeinstallprompt.
+  alert('Nếu chưa thấy hộp cài: trong Chrome bấm ⋮ → “Thêm vào màn hình chính” hoặc “Cài đặt ứng dụng”. Trên iPhone: mở bằng Safari → Chia sẻ → Thêm vào Màn hình chính.');
+}
 </script>
 </body></html>
