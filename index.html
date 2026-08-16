@@ -67,6 +67,11 @@
 .unitChip.unitDone{background:#e7f7ee;border-color:#bfe7cf;color:#11815a}
 @media(max-width:380px){.unitGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
+
+<style id="v82KitchenOverview">
+#kitchenStallList>button{width:100%;border:1px solid var(--line);background:#fff}
+#kitchenStallList>button:active{transform:scale(.99)}
+</style>
 </head><body><div class="app">
 <div class="head"><div class="brand">🏖️ Thác Dê Camping</div><button class="iconbtn" onclick="openSettings()">⚙️</button></div>
 <div id="installPwaBar" style="display:none;margin:10px 0 0">
@@ -96,10 +101,24 @@
 </section>
 
 <section id="kitchen" class="page">
-<div class="titlebar"><div><div class="title">Bếp / Lên món</div><div class="muted">Chọn từng sạp để kiểm món đã lên đủ hay chưa.</div></div><button class="link" onclick="renderKitchen()">↻</button></div>
-<div id="kitchenStallTabs" class="tabs"></div>
-<div id="kitchenSummary" class="kpis"></div>
-<div id="kitchenList" class="section"></div>
+<div id="kitchenOverview">
+  <div class="titlebar">
+    <div><div class="title">Bếp / Lên món</div><div class="muted">Chọn một sạp để mở riêng đơn món của sạp đó.</div></div>
+    <button class="link" onclick="renderKitchen()">↻</button>
+  </div>
+  <div id="kitchenOverviewSummary" class="kpis"></div>
+  <div id="kitchenStallList" class="section"></div>
+</div>
+
+<div id="kitchenDetail" style="display:none">
+  <div class="titlebar">
+    <button class="btn secondary" onclick="closeKitchenStall()">← Danh sách sạp</button>
+    <button class="link" onclick="renderKitchenDetail()">↻</button>
+  </div>
+  <div id="kitchenDetailHead" class="box"></div>
+  <div id="kitchenSummary" class="kpis"></div>
+  <div id="kitchenList" class="section"></div>
+</div>
 </section>
 <section id="reports" class="page"><div class="title">Báo cáo</div><div class="periods"><button class="on" onclick="reportPeriod='day';periodOn(this);renderReport()">Hôm nay</button><button onclick="reportPeriod='week';periodOn(this);renderReport()">Tuần</button><button onclick="reportPeriod='month';periodOn(this);renderReport()">Tháng</button><button onclick="reportPeriod='year';periodOn(this);renderReport()">Năm</button></div><div class="kpis"><div class="kpi"><span>DOANH THU</span><b id="rRev"></b></div><div class="kpi"><span>NGUYÊN LIỆU / HÀNG BÁN</span><b id="rCost"></b></div><div class="kpi"><span>CHI PHÍ VẬN HÀNH</span><b id="rExp"></b></div><div class="kpi"><span>LỢI NHUẬN VỀ TAY</span><b id="rProfit"></b></div><div class="kpi"><span>SỐ BILL</span><b id="rBills"></b></div><div class="kpi"><span>BIÊN LỢI NHUẬN VỀ TAY</span><b id="rMargin"></b></div></div>
 <div class="section"><div class="titlebar"><div class="title">Biểu đồ kinh doanh</div><button class="link" onclick="openDaySettlement(dateKey())">Chốt hôm nay</button></div><div id="businessChart" class="chartCard"></div></div>
@@ -367,65 +386,103 @@ function unfinishedForStall(s){
 }
 function renderKitchen(){
   const active=db.stalls.filter(s=>Object.keys(s.order?.items||{}).length);
-  if(!active.length){
-    $('kitchenStallTabs').innerHTML='';$('kitchenSummary').innerHTML='';
-    $('kitchenList').innerHTML='<div class="box center muted" style="padding:24px">Chưa có sạp nào có món</div>';return;
-  }
-  if(!kitchenStallId||!active.some(s=>s.id===kitchenStallId))kitchenStallId=active[0].id;
-  $('kitchenStallTabs').innerHTML=active.map(s=>{
-    const u=unfinishedForStall(s);
-    return `<button class="${s.id===kitchenStallId?'on':''}" onclick="selectKitchenStall('${s.id}')">${s.name}${s.order?.customer?' · '+s.order.customer:''}${u?' · '+u+' thiếu':' · ✓'}</button>`;
-  }).join('');
-  const s=stall(kitchenStallId);let total=0,served=0;
+  $('kitchenOverview').style.display='block';
+  $('kitchenDetail').style.display='none';
+
+  let totalStalls=active.length,totalUnits=0,missingUnits=0,doneStalls=0;
+  active.forEach(s=>{
+    let u=unfinishedForStall(s);missingUnits+=u;if(u===0)doneStalls++;
+    Object.values(s.order.items||{}).forEach(q=>totalUnits+=+q||0);
+  });
+
+  $('kitchenOverviewSummary').innerHTML=
+    `<div class="kpi"><span>SẠP CÓ MÓN</span><b>${totalStalls}</b></div>
+     <div class="kpi"><span>TỔNG PHẦN</span><b>${totalUnits}</b></div>
+     <div class="kpi"><span>CÒN THIẾU</span><b>${missingUnits}</b></div>
+     <div class="kpi"><span>SẠP ĐÃ ĐỦ</span><b>${doneStalls}</b></div>`;
+
+  $('kitchenStallList').innerHTML=active.length?active.map(s=>{
+    let total=0,served=0;
+    Object.entries(s.order.items||{}).forEach(([pid,q])=>{let k=getKitchenState(s,pid);total+=+q||0;served+=k.served||0});
+    let missing=Math.max(0,total-served);
+    return `<button class="box full" style="display:block;text-align:left;margin-bottom:10px;padding:14px" onclick="openKitchenStall('${s.id}')">
+      <div class="titlebar">
+        <div>
+          <div class="title">${s.name}${s.order?.customer?' · '+s.order.customer:''}</div>
+          <div class="muted">${Object.keys(s.order.items||{}).length} món · đã lên ${served}/${total}</div>
+        </div>
+        <span class="kStatus ${missing===0?'kServed':'kPending'}">${missing===0?'✓ Đã đủ':'Thiếu '+missing}</span>
+      </div>
+      <div class="kProgress"><i style="width:${total?Math.min(100,served/total*100):0}%"></i></div>
+      <div class="muted">Bấm để mở riêng sạp này →</div>
+    </button>`;
+  }).join(''):'<div class="box center muted" style="padding:24px">Chưa có sạp nào có món</div>';
+}
+
+function openKitchenStall(id){
+  kitchenStallId=id;
+  $('kitchenOverview').style.display='none';
+  $('kitchenDetail').style.display='block';
+  renderKitchenDetail();
+}
+
+function closeKitchenStall(){
+  kitchenStallId=null;
+  renderKitchen();
+}
+
+function renderKitchenDetail(){
+  const s=stall(kitchenStallId);
+  if(!s||!Object.keys(s.order?.items||{}).length){closeKitchenStall();return}
+
+  let total=0,served=0;
   Object.entries(s.order.items||{}).forEach(([pid,q])=>{let k=getKitchenState(s,pid);total+=+q||0;served+=k.served||0});
-  $('kitchenSummary').innerHTML=`<div class="kpi"><span>TỔNG</span><b>${total}</b></div><div class="kpi"><span>ĐÃ LÊN</span><b>${served}</b></div><div class="kpi"><span>CÒN THIẾU</span><b>${Math.max(0,total-served)}</b></div><div class="kpi"><span>TRẠNG THÁI</span><b>${served>=total?'✓ Đủ':'Đang lên'}</b></div>`;
-  $('kitchenList').innerHTML=`<div class="kitchenCard"><div class="kitchenHead"><div><b>${s.name}${s.order?.customer?' · '+s.order.customer:''}</b><div class="muted">${served>=total?'✅ Sạp này đã lên đủ món':'Kiểm từng đơn vị món trước khi thanh toán'}</div></div><button class="link" onclick="currentStall='${s.id}';openStall('${s.id}')">Mở bill</button></div>
-  ${Object.entries(s.order.items||{}).map(([pid,q])=>{
-    let p=prod(pid),k=getKitchenState(s,pid),pct=q?Math.min(100,(k.served/q)*100):0;
-    let cls=k.served>=q?'kServed':k.served>0?'kCooking':'kPending',txt=k.served>=q?'Đã đủ':k.served>0?'Đang lên':'Chưa lên';
-    const unitLabel=(p?.unit||'phần').toLowerCase();
-    const singular=unitLabel==='con'?'Con':unitLabel==='đĩa'?'Đĩa':unitLabel==='chai'?'Chai':unitLabel==='lon'?'Lon':unitLabel==='kg'?'Phần':'Phần';
-    const units=(k.units||[]).map((done,i)=>`<button class="unitChip ${done?'unitDone':''}" onclick="toggleKitchenUnit('${s.id}','${pid}',${i})">${done?'✓ ':''}${singular} ${i+1}</button>`).join('');
-    return `<div class="kitchenItem">
-      <div class="titlebar"><div><b>${p?.name||'Món'} × ${q}</b><div class="muted">Đã lên ${k.served}/${q} ${p?.unit||'phần'}</div></div><span class="kStatus ${cls}">${txt}</span></div>
-      <div class="kProgress"><i style="width:${pct}%"></i></div>
-      <div class="unitGrid">${units}</div>
-      <div class="kActions"><button class="btn secondary" onclick="markPreviousUnit('${s.id}','${pid}',false)">− 1 đã lên</button><button class="btn primary" onclick="markNextUnit('${s.id}','${pid}')">+ Lên 1</button><button class="btn green" onclick="serveAll('${s.id}','${pid}')">✓ Lên đủ</button></div>
-      <button class="link" style="margin-top:7px" onclick="cancelKitchenItem('${s.id}','${pid}')">Hủy món</button>
+
+  $('kitchenDetailHead').innerHTML=
+    `<div class="titlebar">
+      <div>
+        <div class="title">${s.name}${s.order?.customer?' · '+s.order.customer:''}</div>
+        <div class="muted">${served>=total?'✅ Sạp này đã lên đủ món':'Đang phục vụ · còn thiếu '+Math.max(0,total-served)+' phần'}</div>
+      </div>
+      <button class="link" onclick="currentStall='${s.id}';openStall('${s.id}')">Mở bill</button>
     </div>`;
-  }).join('')}</div>`;
-  save();
-}
-function selectKitchenStall(id){kitchenStallId=id;renderKitchen()}
 
-function toggleKitchenUnit(sid,pid,index){
-  const s=stall(sid);if(!s)return;
-  const k=getKitchenState(s,pid);
-  if(index<0||index>=k.units.length)return;
-  k.units[index]=!k.units[index];
-  getKitchenState(s,pid);save();renderKitchen();
-  if(currentStall===sid&&$('order')?.classList.contains('on'))renderCart();
-}
-function markNextUnit(sid,pid){
-  const s=stall(sid);if(!s)return;
-  const k=getKitchenState(s,pid);
-  const i=k.units.findIndex(x=>!x);
-  if(i>=0)k.units[i]=true;
-  getKitchenState(s,pid);save();renderKitchen();
-  if(currentStall===sid&&$('order')?.classList.contains('on'))renderCart();
-}
-function markPreviousUnit(sid,pid){
-  const s=stall(sid);if(!s)return;
-  const k=getKitchenState(s,pid);
-  for(let i=k.units.length-1;i>=0;i--){if(k.units[i]){k.units[i]=false;break}}
-  getKitchenState(s,pid);save();renderKitchen();
-  if(currentStall===sid&&$('order')?.classList.contains('on'))renderCart();
-}
+  $('kitchenSummary').innerHTML=
+    `<div class="kpi"><span>TỔNG</span><b>${total}</b></div>
+     <div class="kpi"><span>ĐÃ LÊN</span><b>${served}</b></div>
+     <div class="kpi"><span>CÒN THIẾU</span><b>${Math.max(0,total-served)}</b></div>
+     <div class="kpi"><span>TRẠNG THÁI</span><b>${served>=total?'✓ Đủ':'Đang lên'}</b></div>`;
 
+  $('kitchenList').innerHTML=Object.entries(s.order.items||{}).map(([pid,q])=>{
+    let p=prod(pid),k=getKitchenState(s,pid),pct=q?Math.min(100,k.served/q*100):0;
+    let cls=k.served>=q?'kServed':k.served>0?'kCooking':'kPending';
+    let txt=k.served>=q?'Đã đủ':k.served>0?'Đang lên':'Chưa lên';
+    const unitLabel=(p?.unit||'phần').toLowerCase();
+    const singular=unitLabel==='con'?'Con':unitLabel==='đĩa'?'Đĩa':unitLabel==='chai'?'Chai':unitLabel==='lon'?'Lon':'Phần';
+    const units=(k.units||[]).map((done,i)=>`<button class="unitChip ${done?'unitDone':''}" onclick="toggleKitchenUnit('${s.id}','${pid}',${i})">${done?'✓ ':''}${singular} ${i+1}</button>`).join('');
+
+    return `<div class="kitchenCard" style="margin-bottom:10px">
+      <div class="kitchenItem">
+        <div class="titlebar">
+          <div><b>${p?.name||'Món'} × ${q}</b><div class="muted">Đã lên ${k.served}/${q} ${p?.unit||'phần'}</div></div>
+          <span class="kStatus ${cls}">${txt}</span>
+        </div>
+        <div class="kProgress"><i style="width:${pct}%"></i></div>
+        <div class="unitGrid">${units}</div>
+        <div class="kActions">
+          <button class="btn secondary" onclick="markPreviousUnit('${s.id}','${pid}')">− 1</button>
+          <button class="btn primary" onclick="markNextUnit('${s.id}','${pid}')">+ Lên 1</button>
+          <button class="btn green" onclick="serveAll('${s.id}','${pid}')">✓ Lên đủ</button>
+        </div>
+        <button class="link" style="margin-top:7px" onclick="cancelKitchenItem('${s.id}','${pid}')">Hủy món</button>
+      </div>
+    </div>`;
+  }).join('');
+}
 function setKitchenStatus(sid,pid,status){
   let s=stall(sid);if(!s)return;let k=getKitchenState(s,pid);k.status=status;
   if(status==='pending'&&k.served>=(s.order.items[pid]||0))k.served=0;
-  save();renderKitchen();if(currentStall===sid&&$('order')?.classList.contains('on'))renderCart();
+  save();if(kitchenStallId===sid&&$('kitchenDetail').style.display!=='none')renderKitchenDetail();else renderKitchen();if(currentStall===sid&&$('order')?.classList.contains('on'))renderCart();
 }
 function changeServed(sid,pid,d){
   if(d>0)return markNextUnit(sid,pid);
@@ -435,14 +492,14 @@ function serveAll(sid,pid){
   const s=stall(sid);if(!s)return;
   const k=getKitchenState(s,pid);
   k.units=k.units.map(()=>true);
-  getKitchenState(s,pid);save();renderKitchen();
+  getKitchenState(s,pid);save();if(kitchenStallId===sid)renderKitchenDetail();else renderKitchen();
   if(currentStall===sid&&$('order')?.classList.contains('on'))renderCart();
 }
 function cancelKitchenItem(sid,pid){
   let s=stall(sid);if(!s)return;let p=prod(pid);
   if(!confirm('Hủy '+(p?.name||'món này')+' khỏi bill của '+s.name+'?'))return;
   delete s.order.items[pid];if(s.order.kitchen)delete s.order.kitchen[pid];
-  save();renderKitchen();if(currentStall===sid&&$('order')?.classList.contains('on'))renderCart();
+  save();if(kitchenStallId===sid&&$('kitchenDetail').style.display!=='none')renderKitchenDetail();else renderKitchen();if(currentStall===sid&&$('order')?.classList.contains('on'))renderCart();
 }
 
 function openCheckoutConfirm(){
