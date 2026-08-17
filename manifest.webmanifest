@@ -1,7 +1,7 @@
 {
   "name": "Thác Dê Camping",
   "short_name": "Thác Dê",
-  "description": "Quản lý sạp, bếp, thanh toán, nguyên liệu, chi phí, sổ quỹ và quyết toán.",
+  "description": "Quản lý sạp, bếp, thanh toán, nguyên liệu, phiếu chi, sổ tiền và quyết toán.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

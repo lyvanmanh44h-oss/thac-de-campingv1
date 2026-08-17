@@ -1,0 +1,38 @@
+THÁC DÊ CAMPING V13 FINAL — QA
+
+STATIC QA
+- JavaScript syntax: PASS
+- Missing UI handlers: PASS
+- Missing referenced IDs: PASS
+- Duplicate HTML IDs: PASS
+- Duplicate named functions: PASS
+
+BROWSER REGRESSION — CHROMIUM HEADLESS
+- App load: PASS
+- Internal core self-test: PASS
+- Phiếu chi mở được: PASS
+- Phiếu chi 1 dòng: PASS
+- Gas 2 × 100.000 = 200.000: PASS
+- Thêm Đá 5 × 10.000 => tổng 250.000: PASS
+- Lưu phiếu => dữ liệu 250.000: PASS
+- Mở phiếu chi sau lưu: PASS
+- Phiếu hiển thị đúng Gas/Đá/tổng: PASS
+- Bếp Gà ×2: 0/2: PASS
+- + Lên 1 => 1/2: PASS
+- Hoàn tác => 0/2: PASS
+- Quyết toán 11.041.000 − 2.125.000 = 8.916.000: PASS
+- Runtime JavaScript errors trong test: 0
+
+CẤU TRÚC TÀI CHÍNH
+1. Kinh doanh: Doanh thu − Nguyên liệu − Chi phí vận hành = Lợi nhuận về tay
+2. Đầu tư: theo dõi riêng
+3. Người ứng: tiền cá nhân chi hộ
+4. Sổ tiền đang cầm: tiền quỹ thực tế nằm ở ai
+5. Quyết toán: Còn được hoàn − Tiền đang cầm
+
+V13 NÂNG CẤP CHI PHÍ VẬN HÀNH
+- Mỗi phiếu có nhiều dòng
+- Mỗi dòng: khoản chi, số lượng, đơn vị, đơn giá, thành tiền
+- Tự cộng tổng
+- Xuất phiếu: Ảnh / PDF-In / CSV-Excel
+- Phiếu cũ được migration về dạng 1 dòng khi cần

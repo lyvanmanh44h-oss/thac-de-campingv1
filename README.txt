@@ -1,9 +1,3 @@
-THÁC DÊ CAMPING V12 — TÀI CHÍNH 5 LỚP
+THÁC DÊ CAMPING V13 FINAL PWA
 
-1. Kinh doanh = Doanh thu - Nguyên liệu - Chi phí vận hành = Lợi nhuận về tay
-2. Đầu tư = theo dõi riêng
-3. Người ứng = tiền cá nhân chi hộ
-4. Sổ quỹ = tiền thực tế đang nằm ở từng người
-5. Quyết toán = Còn được hoàn - Tiền đang cầm
-
-Ví dụ: đã ứng 11.041.000, đang cầm 2.125.000 => quỹ còn phải trả 8.916.000.
+Chi phí vận hành dùng phiếu chi nhiều dòng: khoản chi, số lượng, đơn vị, đơn giá, thành tiền. Có xuất ảnh/PDF/CSV. Giữ nguyên Nguyên liệu, Đầu tư, Người ứng, Sổ tiền đang cầm, Quyết toán, Sạp, Bếp, Thanh toán, Chốt ngày.

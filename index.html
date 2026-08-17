@@ -78,7 +78,7 @@ button:disabled{opacity:.42;cursor:not-allowed;transform:none!important}.kitchen
 <style id="v12FinanceStyle">
 .financeHero{background:linear-gradient(135deg,#0f8b5f,#2cb77f);color:#fff;border-radius:20px;padding:16px;margin:10px 0}.financeHero .big{font-size:30px;font-weight:950}.financeGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:9px}.financeCard{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px}.financeCard .value{font-size:19px;font-weight:900;margin-top:3px}.personRow{background:#fff;border:1px solid var(--line);border-radius:14px;padding:11px;margin-bottom:8px}.personRow .settle{font-size:17px;font-weight:950}.positive{color:#11815a}.negative{color:#d94f4f}.neutral{color:#586274}.moneyEquation{background:#f8fafc;border:1px dashed #cfd6df;border-radius:13px;padding:10px;margin-top:8px;font-size:12px}
 </style>
-</head><body><div class="app">
+<style id="v13Polish">.redText{color:#d94f4f!important}.receiptBrand{text-align:center;font-size:24px;font-weight:950}.receiptTable{width:100%;border-collapse:collapse;margin:10px 0;font-size:11px}.receiptTable th,.receiptTable td{padding:7px 4px;border-bottom:1px dashed #bbb;text-align:left;vertical-align:top}.receiptTable th:nth-child(n+2),.receiptTable td:nth-child(n+2){text-align:right}.receiptLine{border-top:1px dashed #999;margin:10px 0}#expenseReceipt{background:#fff;color:#111;padding:18px;border-radius:14px}#expenseItems .form2{grid-template-columns:2fr .75fr .9fr 1.2fr}@media(max-width:520px){#expenseItems .form2{grid-template-columns:1fr 1fr}#expenseItems .ename{grid-column:1/-1}}</style></head><body><div class="app">
 <div class="head"><div class="brand">🏖️ Thác Dê Camping</div><button class="iconbtn" onclick="openSettings()">⚙️</button></div>
 <div id="installPwaBar" style="display:none;margin:10px 0 0">
   <button id="installPwaBtn" class="btn primary full" onclick="installPwaApp()">📲 Cài Thác Dê Camping</button>
@@ -256,22 +256,27 @@ button:disabled{opacity:.42;cursor:not-allowed;transform:none!important}.kitchen
 <h3 id="expenseModalTitle">Ghi chi phí</h3>
 <div id="operatingExpenseForm">
   <div class="form2"><input id="expensePayer" placeholder="Ai cầm tiền đi mua?"><input id="expenseDate" type="date"></div>
-  <div class="sectionHead">Đã mua những gì?</div>
+  <div class="titlebar" style="margin-top:10px"><div><div class="title">Các khoản đã chi</div><div class="muted">Số lượng × đơn giá = thành tiền</div></div><button class="link" onclick="addExpenseItem()">+ Thêm dòng</button></div>
   <div id="expenseItems"></div>
-  <button class="btn secondary full" onclick="addExpenseItem()">+ Thêm món</button>
-  <div class="sum" style="margin-top:9px"><div class="line grand"><span>Tổng chi phí</span><span id="expenseItemsTotal">0 ₫</span></div></div>
-  <textarea id="expenseNote" style="margin-top:9px" placeholder="Ghi chú (tùy chọn)"></textarea>
+  <div class="sum" style="margin-top:9px"><div class="line grand"><span>TỔNG CHI</span><span id="expenseItemsTotal">0 ₫</span></div></div>
+  <textarea id="expenseNote" style="margin-top:9px" placeholder="Ghi chú chung (tùy chọn)"></textarea>
 </div>
-<div id="investmentForm" style="display:none">
-  <div class="form2">
-    <input id="investmentName" class="wide" placeholder="Đầu tư gì? VD xi măng, bạt, dây thừng...">
-    <input id="investmentAmount" type="number" placeholder="Số tiền">
-    <input id="investmentDate" type="date">
-    <input id="investmentPayer" class="wide" placeholder="Ai trả tiền?">
-    <textarea id="investmentNote" class="wide" placeholder="Ghi chú"></textarea>
-  </div>
+<div id="investmentForm" style="display:none"><div class="form2">
+  <input id="investmentName" class="wide" placeholder="Đầu tư gì? VD xi măng, bạt, dây thừng...">
+  <input id="investmentAmount" type="number" placeholder="Số tiền"><input id="investmentDate" type="date">
+  <input id="investmentPayer" class="wide" placeholder="Ai trả tiền?"><textarea id="investmentNote" class="wide" placeholder="Ghi chú"></textarea>
+</div></div>
+<div class="actions" style="margin-top:9px"><button class="btn secondary" onclick="closeM('expenseModal')">Hủy</button><button class="btn primary" onclick="saveExpenseSmart()">Lưu phiếu</button></div>
+</div></div>
+
+<div id="expenseReceiptModal" class="modal"><div class="sheet">
+<div id="expenseReceipt" class="receipt"></div>
+<div class="grid2" style="margin-top:10px">
+  <button class="btn secondary" onclick="closeM('expenseReceiptModal')">Đóng</button>
+  <button class="btn secondary" onclick="saveExpenseReceiptImage()">🖼 Lưu ảnh</button>
+  <button class="btn secondary" onclick="saveExpenseReceiptPDF()">📄 PDF / In</button>
+  <button class="btn primary" onclick="exportExpenseReceiptCSV()">📊 CSV/Excel</button>
 </div>
-<div class="actions" style="margin-top:9px"><button class="btn secondary" onclick="closeM('expenseModal')">Hủy</button><button class="btn primary" onclick="saveExpenseSmart()">Lưu</button></div>
 </div></div>
 
 <div id="daySettlementModal" class="modal"><div class="sheet">
@@ -305,12 +310,12 @@ if(!db.meta.brandMigratedToThacDe){
   db.meta.brandMigratedToThacDe=true;
   localStorage.setItem(KEY,JSON.stringify(db));
 }
-db.meta=db.meta||{};db.meta.version=11;db.meta.smallStallPrice=db.meta.smallStallPrice||200000;db.meta.largeStallPrice=db.meta.largeStallPrice||300000;
+db.meta=db.meta||{};db.meta.version=13;db.meta.smallStallPrice=db.meta.smallStallPrice||200000;db.meta.largeStallPrice=db.meta.largeStallPrice||300000;
 db.stalls.forEach(s=>{s.baseName=s.baseName||s.name;s.order=s.order||{};s.order.items=s.order.items||{};if(s.rentEnabled===undefined)s.rentEnabled=true});
 db.bills.forEach(b=>{b.updatedAt=b.updatedAt||new Date((b.date||dateKey())+'T'+(b.time||'00:00')).getTime()||0});
 
 // ===== V6 KITCHEN / SERVING MIGRATION =====
-db.meta=db.meta||{};db.meta.version=11;
+db.meta=db.meta||{};db.meta.version=13;
 db.stalls.forEach(s=>{
   s.order=s.order||{};s.order.items=s.order.items||{};s.order.kitchen=s.order.kitchen||{};
   Object.entries(s.order.items).forEach(([pid,q])=>{
@@ -323,7 +328,7 @@ db.stalls.forEach(s=>{
 
 
 // ===== V12 FINANCE LEDGER MIGRATION =====
-db.meta=db.meta||{};db.meta.version=12;
+db.meta=db.meta||{};db.meta.version=13;
 db.cashLedger=db.cashLedger||[];
 db.people=db.people||[];
 function personNames(){
@@ -337,6 +342,22 @@ function personNames(){
   return [...s].filter(Boolean).sort((a,b)=>a.localeCompare(b,'vi'));
 }
 function rememberPerson(name){name=(name||'').trim();if(!name)return;db.people=db.people||[];if(!db.people.includes(name))db.people.push(name)}
+
+
+// ===== V13 EXPENSE VOUCHER MIGRATION =====
+db.meta=db.meta||{};db.meta.version=13;
+db.expenses=db.expenses||[];
+db.expenses.forEach(x=>{
+  x.items=Array.isArray(x.items)?x.items:[];
+  if(!x.items.length && x.name && (+x.amount||0)>0){
+    x.items=[{name:x.name,qty:1,unit:'lần',unitPrice:+x.amount||0,total:+x.amount||0}];
+  }
+  x.items=x.items.map(i=>{
+    const qty=Math.max(0,+i.qty||1),unitPrice=+i.unitPrice||(+i.amount||0)||0;
+    return {name:i.name||'Chi phí',qty,unit:i.unit||'lần',unitPrice,total:qty*unitPrice};
+  });
+  x.amount=x.items.reduce((a,i)=>a+(+i.total||0),0) || (+x.amount||0);
+});
 
 const $=id=>document.getElementById(id),money=n=>(+n||0).toLocaleString('vi-VN')+' ₫',save=()=>localStorage.setItem(KEY,JSON.stringify(db)),uid=p=>p+'_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),prod=id=>db.products.find(x=>x.id===id),stall=id=>db.stalls.find(x=>x.id===id);
 function dateKey(d=new Date()){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
@@ -401,10 +422,10 @@ function applyRentChoice(){let c=$('rentChoice').value;$('rentAmount').value=c==
 
 
 // ===== V7 CLEAN MIGRATION =====
-db.meta=db.meta||{};db.meta.version=11;db.meta.appName='Thác Dê Camping';
+db.meta=db.meta||{};db.meta.version=13;db.meta.appName='Thác Dê Camping';
 
 // ===== V11 KITCHEN STATE MIGRATION =====
-db.meta=db.meta||{};db.meta.version=11;
+db.meta=db.meta||{};db.meta.version=13;
 db.stalls.forEach(s=>{s.baseName=s.baseName||s.name;s.order=s.order||{};s.order.items=s.order.items||{};s.order.kitchen=s.order.kitchen||{};Object.entries(s.order.items).forEach(([pid,q])=>{const qty=Math.max(0,+q||0);let k=s.order.kitchen[pid]||(s.order.kitchen[pid]={status:'pending',served:0});if(!Array.isArray(k.units)){const old=Math.max(0,Math.min(qty,+k.served||0));k.units=Array(qty).fill(false);for(let i=0;i<old;i++)k.units[i]=true}else{k.units=k.units.slice(0,qty);while(k.units.length<qty)k.units.push(false)}k.unitsInitialized=true;k.served=k.units.filter(Boolean).length;k.status=k.served>=qty&&qty>0?'served':k.served>0?'cooking':'pending'})});
 
 
@@ -595,42 +616,52 @@ function tabExpense(b){document.querySelectorAll('#expenses .tabs button').forEa
 /* V8 removed obsolete duplicate saveExpenseSmart */
 
 
+
+
+
+
+
+
+let currentExpenseReceiptId=null;
 function openExpense(){
   const investment=expenseView==='investment';
   $('expenseModalTitle').textContent=investment?'Ghi đầu tư':'Ghi chi phí vận hành';
-  $('operatingExpenseForm').style.display=investment?'none':'block';
-  $('investmentForm').style.display=investment?'block':'none';
-  if(investment){
-    $('investmentName').value='';$('investmentAmount').value='';$('investmentDate').value=dateKey();$('investmentPayer').value='';$('investmentNote').value='';
-  }else{
-    $('expensePayer').value='';$('expenseDate').value=dateKey();$('expenseNote').value='';$('expenseItems').innerHTML='';addExpenseItem();updateExpenseTotal();
-  }
+  $('operatingExpenseForm').style.display=investment?'none':'block';$('investmentForm').style.display=investment?'block':'none';
+  if(investment){$('investmentName').value='';$('investmentAmount').value='';$('investmentDate').value=dateKey();$('investmentPayer').value='';$('investmentNote').value=''}
+  else{$('expensePayer').value='';$('expenseDate').value=dateKey();$('expenseNote').value='';$('expenseItems').innerHTML='';addExpenseItem();updateExpenseTotal()}
   $('expenseModal').style.display='flex';
 }
-function addExpenseItem(name='',amount=''){
-  const d=document.createElement('div');d.className='expenseItem';d.innerHTML=`<div class="expenseLine"><input class="ename" placeholder="Mua gì? VD gas, mắm, đá..." value="${name}"><input class="eamount" type="number" placeholder="Số tiền" value="${amount}" oninput="updateExpenseTotal()"><button class="iconBtn dangerLink" onclick="this.closest('.expenseItem').remove();updateExpenseTotal()">✕</button></div>`;$('expenseItems').appendChild(d);updateExpenseTotal();
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function addExpenseItem(name='',qty=1,unit='lần',unitPrice=''){
+  const d=document.createElement('div');d.className='expenseItem box';d.style.marginBottom='8px';
+  d.innerHTML=`<div class="form2"><input class="ename wide" placeholder="Khoản chi: gas, mắm, đá..." value="${esc(name)}"><input class="eqty" type="number" min="0" step="0.01" placeholder="SL" value="${qty}" oninput="updateExpenseLine(this)"><input class="eunit" placeholder="Đơn vị" value="${esc(unit)}"><input class="eunitprice" type="number" min="0" step="1" placeholder="Đơn giá" value="${unitPrice}" oninput="updateExpenseLine(this)"></div><div class="titlebar" style="margin-top:6px"><div class="muted">Thành tiền: <b class="elineTotal">0 ₫</b></div><button class="link redText" onclick="removeExpenseItem(this)">✕ Xóa</button></div>`;
+  $('expenseItems').appendChild(d);updateExpenseLine(d.querySelector('.eqty'));
 }
-function updateExpenseTotal(){
-  $('expenseItemsTotal').textContent=money([...document.querySelectorAll('.expenseItem .eamount')].reduce((a,x)=>a+(+x.value||0),0));
-}
+function removeExpenseItem(btn){const row=btn.closest('.expenseItem');if(row)row.remove();if(!$('expenseItems').children.length)addExpenseItem();updateExpenseTotal()}
+function updateExpenseLine(input){const row=input.closest('.expenseItem');if(!row)return;const qty=Math.max(0,+row.querySelector('.eqty').value||0),price=Math.max(0,+row.querySelector('.eunitprice').value||0);row.querySelector('.elineTotal').textContent=money(qty*price);updateExpenseTotal()}
+function updateExpenseTotal(){const total=[...document.querySelectorAll('.expenseItem')].reduce((a,row)=>a+Math.max(0,+row.querySelector('.eqty').value||0)*Math.max(0,+row.querySelector('.eunitprice').value||0),0);if($('expenseItemsTotal'))$('expenseItemsTotal').textContent=money(total);return total}
+function collectExpenseItems(){return [...document.querySelectorAll('.expenseItem')].map(row=>{const name=row.querySelector('.ename').value.trim(),qty=Math.max(0,+row.querySelector('.eqty').value||0),unit=row.querySelector('.eunit').value.trim()||'lần',unitPrice=Math.max(0,+row.querySelector('.eunitprice').value||0);return{name,qty,unit,unitPrice,total:qty*unitPrice}}).filter(x=>x.name&&x.qty>0&&x.total>0)}
 function saveExpenseSmart(){
-  const day=expenseView==='investment'?($('investmentDate').value||dateKey()):($('expenseDate').value||dateKey());if(isDayClosed(day))return alert('Ngày '+day+' đã chốt. Hãy mở lại ngày trước khi ghi khoản mới.');
   if(expenseView==='investment'){
-    const name=$('investmentName').value.trim(),amount=+$('investmentAmount').value||0,payer=$('investmentPayer').value.trim();
-    if(!name||amount<=0)return alert('Nhập nội dung đầu tư và số tiền.');
-    db.investments.unshift({id:uid('investment'),date:day,name,category:'Đầu tư',amount,payer,note:$('investmentNote').value.trim(),updatedAt:Date.now()});
-  }else{
-    const payer=$('expensePayer').value.trim();
-    const items=[...document.querySelectorAll('.expenseItem')].map(x=>({name:x.querySelector('.ename').value.trim(),amount:+x.querySelector('.eamount').value||0})).filter(x=>x.name&&x.amount>0);
-    if(!payer)return alert('Nhập người cầm tiền.');
-    if(!items.length)return alert('Thêm ít nhất một món chi phí.');
-    const total=items.reduce((a,x)=>a+x.amount,0);
-    db.expenses.unshift({id:uid('expense'),date:day,name:items.map(x=>x.name).join(' + '),category:'Chi phí vận hành',amount:total,payer,note:$('expenseNote').value.trim(),items,updatedAt:Date.now()});
+    const name=$('investmentName').value.trim(),amount=+$('investmentAmount').value||0,payer=$('investmentPayer').value.trim();if(!name||amount<=0)return alert('Nhập nội dung đầu tư và số tiền.');rememberPerson(payer);db.investments.unshift({id:uid('investment'),date:$('investmentDate').value||dateKey(),name,category:'Đầu tư',amount,payer,note:$('investmentNote').value.trim(),updatedAt:Date.now()});save();closeM('expenseModal');renderExpenses();renderReport();return;
   }
-  save();closeM('expenseModal');renderExpenses();renderReport();
+  const payer=$('expensePayer').value.trim(),items=collectExpenseItems();if(!payer)return alert('Nhập người cầm tiền.');if(!items.length)return alert('Thêm ít nhất một dòng chi phí hợp lệ.');rememberPerson(payer);const total=items.reduce((a,x)=>a+x.total,0);const rec={id:uid('expense'),code:'PC'+String(Date.now()).slice(-7),date:$('expenseDate').value||dateKey(),name:items.map(x=>x.name).join(' + '),category:'Chi phí vận hành',amount:total,payer,note:$('expenseNote').value.trim(),items,updatedAt:Date.now()};db.expenses.unshift(rec);save();closeM('expenseModal');renderExpenses();renderReport();openExpenseReceipt(rec.id)
+}
+function openExpenseReceipt(id){
+  const x=db.expenses.find(e=>e.id===id);if(!x)return alert('Không tìm thấy phiếu chi.');currentExpenseReceiptId=id;const items=Array.isArray(x.items)&&x.items.length?x.items:[{name:x.name,qty:1,unit:'lần',unitPrice:x.amount,total:x.amount}];
+  $('expenseReceipt').innerHTML=`<div class="receiptBrand">THÁC DÊ CAMPING</div><div class="center"><b>PHIẾU CHI VẬN HÀNH</b></div><div class="center"><b>${x.code||x.id}</b></div><div class="center muted">${x.date} · Người cầm tiền: ${esc(x.payer||'—')}</div><div class="receiptLine"></div><table class="receiptTable"><thead><tr><th>Khoản chi</th><th>SL</th><th>Đơn giá</th><th>Tiền</th></tr></thead><tbody>${items.map(i=>`<tr><td>${esc(i.name)}</td><td>${i.qty} ${esc(i.unit||'')}</td><td>${money(i.unitPrice)}</td><td><b>${money(i.total)}</b></td></tr>`).join('')}</tbody></table><div class="receiptLine"></div><div class="line grand"><span>TỔNG CHI</span><b>${money(x.amount)}</b></div>${x.note?`<div class="muted" style="margin-top:8px">Ghi chú: ${esc(x.note)}</div>`:''}<div class="center muted" style="margin-top:12px">Phiếu dùng để đối chiếu chi phí vận hành</div>`;$('expenseReceiptModal').style.display='flex'
+}
+async function saveExpenseReceiptImage(){try{const canvas=await renderElementToCanvas($('expenseReceipt'),2);const x=db.expenses.find(e=>e.id===currentExpenseReceiptId);downloadCanvasPNG(canvas,'Thac-De-Phieu-Chi-'+(x?.code||Date.now())+'.png')}catch(e){alert('Không lưu được ảnh: '+e.message)}}
+function saveExpenseReceiptPDF(){window.print()}
+function exportExpenseReceiptCSV(){const x=db.expenses.find(e=>e.id===currentExpenseReceiptId);if(!x)return;const items=Array.isArray(x.items)?x.items:[];const rows=[['THÁC DÊ CAMPING - PHIẾU CHI',x.code||x.id],['Ngày',x.date],['Người cầm tiền',x.payer||''],[],['Khoản chi','Số lượng','Đơn vị','Đơn giá','Thành tiền'],...items.map(i=>[i.name,i.qty,i.unit,i.unitPrice,i.total]),[],['TỔNG CHI','','','',x.amount],['Ghi chú',x.note||'']];download('\ufeff'+rows.map(r=>r.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\n'),'Thac-De-Phieu-Chi-'+(x.code||Date.now())+'.csv','text/csv;charset=utf-8')}
+
+function renderExpenses(){
+  db.investments=db.investments||[];
+  const et=db.expenses.filter(x=>x.date===dateKey()).reduce((a,x)=>a+(+x.amount||0),0),it=db.investments.filter(x=>x.date===dateKey()).reduce((a,x)=>a+(+x.amount||0),0);$('eToday').textContent=money(et);$('iToday').textContent=money(it);
+  const arr=expenseView==='expense'?db.expenses:db.investments;
+  $('expenseList').innerHTML=arr.length?arr.slice(0,80).map(x=>expenseView==='investment'?`<div class="box" style="margin-bottom:8px"><div class="titlebar"><div><b>${esc(x.name)}</b><div class="muted">${x.date}${x.payer?' · '+esc(x.payer):''}</div></div><b>${money(x.amount)}</b></div>${x.note?`<div class="muted">${esc(x.note)}</div>`:''}<button class="link" onclick="deleteExpense('investment','${x.id}')">Xóa</button></div>`:`<div class="box" style="margin-bottom:8px"><div class="titlebar"><div><b>${x.code||'Phiếu chi'}</b><div class="muted">${x.date} · ${esc(x.payer||'—')} · ${(x.items||[]).length||1} khoản</div></div><b>${money(x.amount)}</b></div><div class="muted">${(x.items||[]).slice(0,3).map(i=>`${esc(i.name)} ${i.qty||1} ${esc(i.unit||'')}`).join(' · ')}${(x.items||[]).length>3?' …':''}</div><div class="titlebar"><button class="link" onclick="openExpenseReceipt('${x.id}')">Xem / xuất phiếu →</button><button class="link" onclick="deleteExpense('expense','${x.id}')">Xóa</button></div></div>`).join(''):'<div class="center muted" style="padding:18px">Chưa có khoản nào</div>'
 }
 
-function renderExpenses(){db.investments=db.investments||[];let et=db.expenses.filter(x=>x.date===dateKey()).reduce((a,x)=>a+x.amount,0),it=db.investments.filter(x=>x.date===dateKey()).reduce((a,x)=>a+x.amount,0);$('eToday').textContent=money(et);$('iToday').textContent=money(it);let arr=expenseView==='expense'?db.expenses:db.investments;$('expenseList').innerHTML=arr.length?arr.slice(0,60).map(x=>`<div class="row"><div><b>${x.name}</b><div class="muted">${x.date} · ${x.category}${x.payer?' · '+x.payer+' trả':''}${x.note?' · '+x.note:''}</div></div><div style="text-align:right"><b>${money(x.amount)}</b><div><button class="link" onclick="deleteExpense('${expenseView}','${x.id}')">Xóa</button></div></div></div>`).join(''):'<div class="center muted" style="padding:18px">Chưa có khoản nào</div>'}
 function deleteExpense(kind,id){if(!confirm('Xóa khoản này?'))return;let k=kind==='expense'?'expenses':'investments';db[k]=db[k].filter(x=>x.id!==id);save();renderExpenses();renderReport()}
 /* V7 removed obsolete duplicate renderReport */
 function renderTimeline(){/* V10 obsolete: replaced by renderTimelineV54 */}
