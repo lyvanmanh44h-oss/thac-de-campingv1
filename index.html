@@ -72,6 +72,12 @@
 #kitchenStallList>button{width:100%;border:1px solid var(--line);background:#fff}
 #kitchenStallList>button:active{transform:scale(.99)}
 </style>
+<style id="v11Polish">
+button:disabled{opacity:.42;cursor:not-allowed;transform:none!important}.kitchenMiniStats{display:flex;justify-content:space-between;gap:8px;margin-top:10px;font-size:12px;color:var(--muted)}.dangerLink{color:#d14d4d!important}.expenseLine{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(95px,.7fr) 38px;gap:7px;align-items:center;margin-bottom:7px}.iconBtn{height:42px;border:1px solid var(--line);background:#fff;border-radius:11px;font-weight:900}.kitchenCard{box-shadow:0 2px 10px rgba(20,35,60,.04)}.unitChip{min-height:42px}.unitChip:active{transform:scale(.98)}#kitchenDetailHead{position:sticky;top:0;z-index:3;background:#fff}.kActions{grid-template-columns:1fr 1fr 1fr}@media(max-width:420px){.kActions{grid-template-columns:1fr 1fr}.kActions .btn.green{grid-column:1/-1}.expenseLine{grid-template-columns:1fr 105px 38px}}
+</style>
+<style id="v12FinanceStyle">
+.financeHero{background:linear-gradient(135deg,#0f8b5f,#2cb77f);color:#fff;border-radius:20px;padding:16px;margin:10px 0}.financeHero .big{font-size:30px;font-weight:950}.financeGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:9px}.financeCard{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px}.financeCard .value{font-size:19px;font-weight:900;margin-top:3px}.personRow{background:#fff;border:1px solid var(--line);border-radius:14px;padding:11px;margin-bottom:8px}.personRow .settle{font-size:17px;font-weight:950}.positive{color:#11815a}.negative{color:#d94f4f}.neutral{color:#586274}.moneyEquation{background:#f8fafc;border:1px dashed #cfd6df;border-radius:13px;padding:10px;margin-top:8px;font-size:12px}
+</style>
 </head><body><div class="app">
 <div class="head"><div class="brand">🏖️ Thác Dê Camping</div><button class="iconbtn" onclick="openSettings()">⚙️</button></div>
 <div id="installPwaBar" style="display:none;margin:10px 0 0">
@@ -80,7 +86,7 @@
 </div>
 
 
-<section id="home" class="page on"><div class="hero"><div class="small">Doanh thu hôm nay</div><div class="num" id="todayRev">0 ₫</div><div class="heroGrid"><div class="heroBox"><span class="small">Lợi nhuận thực</span><b id="todayProfit">0 ₫</b></div><div class="heroBox"><span class="small">Bill / Đặt trước</span><b><span id="todayBills">0</span> / <span id="preCount">0</span></b></div></div></div>
+<section id="home" class="page on"><div class="hero"><div class="small">Doanh thu hôm nay</div><div class="num" id="todayRev">0 ₫</div><div class="heroGrid"><div class="heroBox"><span class="small">Lợi nhuận về tay</span><b id="todayProfit">0 ₫</b></div><div class="heroBox"><span class="small">Bill / Đặt trước</span><b><span id="todayBills">0</span> / <span id="preCount">0</span></b></div></div></div>
 <div class="section"><div class="titlebar"><div class="title">Đặt trước tiếp theo</div><button class="link" onclick="show('preorders')">Xem lịch</button></div><div id="nextPre" class="box"></div></div><div class="section"><div class="titlebar"><div class="title">Sạp & trạng thái</div><button class="link" onclick="openStallManage()">Quản lý sạp</button></div><div id="stallGrid" class="grid2"></div></div></section>
 
 <section id="order" class="page"><div class="titlebar"><div><div class="title" id="orderTitle"></div><div class="statusline"><span id="orderStatus" class="tag"></span><span id="customerMini" class="tag reserved" style="display:none"></span></div></div><button class="link" onclick="show('home')">← Sạp</button></div>
@@ -121,7 +127,7 @@
 </div>
 </section>
 <section id="reports" class="page"><div class="title">Báo cáo</div><div class="periods"><button class="on" onclick="reportPeriod='day';periodOn(this);renderReport()">Hôm nay</button><button onclick="reportPeriod='week';periodOn(this);renderReport()">Tuần</button><button onclick="reportPeriod='month';periodOn(this);renderReport()">Tháng</button><button onclick="reportPeriod='year';periodOn(this);renderReport()">Năm</button></div><div class="kpis"><div class="kpi"><span>DOANH THU</span><b id="rRev"></b></div><div class="kpi"><span>NGUYÊN LIỆU / HÀNG BÁN</span><b id="rCost"></b></div><div class="kpi"><span>CHI PHÍ VẬN HÀNH</span><b id="rExp"></b></div><div class="kpi"><span>LỢI NHUẬN VỀ TAY</span><b id="rProfit"></b></div><div class="kpi"><span>SỐ BILL</span><b id="rBills"></b></div><div class="kpi"><span>BIÊN LỢI NHUẬN VỀ TAY</span><b id="rMargin"></b></div></div>
-<div class="section"><div class="titlebar"><div class="title">Biểu đồ kinh doanh</div><button class="link" onclick="openDaySettlement(dateKey())">Chốt hôm nay</button></div><div id="businessChart" class="chartCard"></div></div>
+<div class="section"><div class="titlebar"><div><div class="title">Quyết toán tiền</div><div class="muted">Ai ứng · ai đang cầm · cuối cùng cần trả/giao lại bao nhiêu</div></div><button class="link" onclick="openSettlementCenter()">Mở</button></div></div><div class="section"><div class="titlebar"><div class="title">Biểu đồ kinh doanh</div><button class="link" onclick="openDaySettlement(dateKey())">Chốt hôm nay</button></div><div id="businessChart" class="chartCard"></div></div>
 <div class="profitHero"><div class="small" style="color:#e5fff5">LỢI NHUẬN VỀ TAY</div><div id="profitInHand" class="value">0 ₫</div><div class="small" style="color:#e5fff5">Doanh thu − mua hàng thực tế − chi phí vận hành</div></div>
 <div class="section"><div class="title">Chi tiết theo thời gian</div><div id="timeline" class="box"></div></div><div class="section"><div class="title">Tiền thu theo phương thức</div><div id="paySplit" class="box"></div></div>
 <div class="section"><div class="title">Sản phẩm đã bán</div><div id="soldList" class="box"></div></div></section>
@@ -142,13 +148,42 @@
 <button class="btn secondary" onclick="closeM('moreModal');show('inventory');renderInventory();setTimeout(openPurchase,50)">🛒 Nguyên liệu / hàng bán</button>
 <button class="btn secondary" onclick="closeM('moreModal');expenseView='expense';show('expenses');renderExpenses()">💸 Chi phí vận hành</button>
 <button class="btn secondary" onclick="closeM('moreModal');expenseView='investment';show('expenses');renderExpenses()">🏗️ Đầu tư</button>
+<button class="btn secondary" onclick="closeM('moreModal');openCashLedger()">👛 Sổ quỹ / Tiền đang cầm</button>
+<button class="btn secondary" onclick="closeM('moreModal');openSettlementCenter()">🤝 Quyết toán</button>
 <button class="btn secondary" onclick="closeM('moreModal');openDebts()">👥 Người ứng tiền</button>
 <button class="btn secondary" onclick="closeM('moreModal');openSettings()">💾 Dữ liệu & cài đặt</button>
 </div>
 <button class="btn dark full" style="margin-top:10px" onclick="closeM('moreModal')">Đóng</button>
 </div></div>
 
-<div id="debtsModal" class="modal"><div class="sheet"><h3>Người ứng vốn & hoàn tiền</h3>
+
+<div id="cashLedgerModal" class="modal"><div class="sheet">
+<div class="titlebar"><h3 style="margin:0">👛 Sổ quỹ / Tiền đang cầm</h3><button class="link" onclick="openCashTxn()">+ Ghi biến động</button></div>
+<div class="muted">Theo dõi tiền thực tế đang nằm ở từng người. Không dùng số này để tính lợi nhuận.</div>
+<div id="cashLedgerSummary" class="section"></div>
+<div class="section"><div class="title">Biến động gần đây</div><div id="cashLedgerList" class="box"></div></div>
+<button class="btn dark full" onclick="closeM('cashLedgerModal')">Đóng</button>
+</div></div>
+
+<div id="cashTxnModal" class="modal"><div class="sheet">
+<h3>Ghi biến động tiền</h3>
+<div class="form2">
+<input id="cashTxnDate" type="date">
+<input id="cashTxnPerson" placeholder="Ai đang cầm / nhận / giao tiền?">
+<select id="cashTxnType"><option value="opening">Số dư đầu kỳ</option><option value="received">Nhận thêm tiền</option><option value="handed">Đã giao / nộp lại tiền</option><option value="adjust">Điều chỉnh ±</option></select>
+<input id="cashTxnAmount" type="number" placeholder="Số tiền">
+<textarea id="cashTxnNote" class="wide" placeholder="VD: tiền từ lần trước, tiền bán hàng hôm nay..."></textarea>
+</div>
+<div class="actions"><button class="btn secondary" onclick="closeM('cashTxnModal')">Hủy</button><button class="btn primary" onclick="saveCashTxn()">Lưu</button></div>
+</div></div>
+
+<div id="settlementCenterModal" class="modal"><div class="sheet">
+<div class="titlebar"><h3 style="margin:0">🤝 Quyết toán tiền</h3><input id="settlementDate" type="date" style="max-width:150px" onchange="renderSettlementCenter()"></div>
+<div class="muted">Tách riêng lợi nhuận, tiền cá nhân ứng và tiền quỹ đang nằm ở từng người.</div>
+<div id="settlementCenterContent" class="section"></div>
+<div class="actions"><button class="btn secondary" onclick="exportSettlementCSV()">📊 Xuất CSV</button><button class="btn dark" onclick="closeM('settlementCenterModal')">Đóng</button></div>
+</div></div>
+<div id="debtsModal" class="modal"><div class="sheet"><h3>Người ứng tiền & hoàn tiền</h3>
 <div class="warn">Số dư = tiền đã ứng nhập hàng + chi hộ vận hành − tiền đã hoàn. Số dư được giữ qua các ngày.</div>
 <div id="debtList" class="box" style="margin-top:9px"></div>
 <div class="sectionHead">Ghi hoàn tiền</div><div class="form2"><input id="repayPerson" placeholder="Tên người"><input id="repayAmount" type="number" placeholder="Số tiền hoàn"><input id="repayDate" type="date"><input id="repayNote" placeholder="Ghi chú"></div>
@@ -172,31 +207,24 @@
 <div id="receiptModal" class="modal"><div class="sheet"><div id="receipt" class="receipt"></div><div class="actions noPrint"><button class="btn secondary" onclick="closeM('receiptModal')">Đóng</button><button class="btn secondary" onclick="saveReceiptImage()">🖼️ Lưu ảnh</button><button class="btn secondary" onclick="saveReceiptPDF()">📄 Lưu PDF</button><button class="btn primary" onclick="printReceipt()">🖨️ In</button></div></div></div>
 
 
-<div id="stallTypeModal" class="modal"><div class="sheet">
-<h3 id="stallTypeTitle">Chọn loại sạp</h3>
-<div class="grid2">
-  <button class="btn secondary" style="padding:16px" onclick="chooseStallType('big')">
-    <div style="font-size:28px">🏕️</div>
-    <div><b>Sạp to</b></div>
-    <div class="muted" id="bigStallPriceLabel">300.000 ₫</div>
-  </button>
-  <button class="btn secondary" style="padding:16px" onclick="chooseStallType('small')">
-    <div style="font-size:28px">⛺</div>
-    <div><b>Sạp bé</b></div>
-    <div class="muted" id="smallStallPriceLabel">200.000 ₫</div>
-  </button>
-</div>
-<button class="btn dark full" style="margin-top:10px" onclick="closeM('stallTypeModal')">Hủy</button>
-</div></div>
 <div id="stallModal" class="modal"><div class="sheet"><h3>Quản lý sạp</h3>
 <button class="btn primary full" onclick="toggleInlineAddStall()">+ Thêm sạp</button>
 <div id="inlineAddStall" class="box" style="display:none;margin-top:9px;padding:10px">
   <div class="title" style="margin-bottom:8px">Chọn loại sạp</div>
   <div class="grid2">
-    <button class="btn secondary" onclick="quickAddStall('big')">🏕️ <b>Sạp to</b><br><span id="inlineBigPrice" class="muted">300.000 ₫</span></button>
-    <button class="btn secondary" onclick="quickAddStall('small')">⛺ <b>Sạp bé</b><br><span id="inlineSmallPrice" class="muted">200.000 ₫</span></button>
+    <button class="btn secondary" style="padding:14px" onclick="quickAddStall('big')">🏕️ <b>Sạp to</b><br><span id="inlineBigPrice" class="muted">300.000 ₫</span></button>
+    <button class="btn secondary" style="padding:14px" onclick="quickAddStall('small')">⛺ <b>Sạp bé</b><br><span id="inlineSmallPrice" class="muted">200.000 ₫</span></button>
   </div>
   <button class="btn dark full" style="margin-top:8px" onclick="toggleInlineAddStall(false)">Hủy</button>
+</div>
+<div id="inlineEditStall" class="box" style="display:none;margin-top:9px;padding:10px">
+  <div class="title">Sửa sạp</div>
+  <input id="editStallName" style="margin-top:8px" placeholder="Tên sạp / tên khách">
+  <div class="grid2" style="margin-top:8px">
+    <button id="editTypeBig" class="btn secondary" onclick="setEditStallType('big')">🏕️ Sạp to</button>
+    <button id="editTypeSmall" class="btn secondary" onclick="setEditStallType('small')">⛺ Sạp bé</button>
+  </div>
+  <div class="actions" style="margin-top:8px"><button class="btn secondary" onclick="closeInlineEditStall()">Hủy</button><button class="btn primary" onclick="saveInlineStallEdit()">Lưu thay đổi</button></div>
 </div>
 <div id="stallManage" class="box" style="margin-top:9px"></div>
 <button class="btn dark full" style="margin-top:9px" onclick="closeM('stallModal')">Xong</button>
@@ -246,14 +274,6 @@
 <div class="actions" style="margin-top:9px"><button class="btn secondary" onclick="closeM('expenseModal')">Hủy</button><button class="btn primary" onclick="saveExpenseSmart()">Lưu</button></div>
 </div></div>
 
-<div id="reconModal" class="modal"><div class="sheet"><h3>Quyết toán cuối ngày</h3>
-<div class="kpis"><div class="kpi"><span>DOANH THU</span><b id="qRev"></b></div><div class="kpi"><span>LỢI NHUẬN THỰC</span><b id="qProfit"></b></div></div>
-<div class="section"><div class="title">Dòng tiền hôm nay</div><div id="cashRecon" class="box"></div></div>
-<div class="section"><div class="title">Tiền từng người đã bỏ</div><div id="peopleCapital" class="box"></div></div>
-<div class="section"><button class="btn orange full" onclick="profitShare()">Chia đều lợi nhuận</button><div id="shareResult" class="box" style="margin-top:9px"></div></div>
-<button class="btn dark full" style="margin-top:9px" onclick="closeM('reconModal')">Đóng</button></div></div>
-
-
 <div id="daySettlementModal" class="modal"><div class="sheet">
 <div class="titlebar"><h3 style="margin:0">Chốt ngày</h3><span id="settleStatus" class="tag openBadge">Chưa chốt</span></div>
 <div class="form2"><input id="settleDate" type="date" onchange="renderDaySettlement(this.value)"><button class="btn secondary" onclick="renderDaySettlement($('settleDate').value)">Xem ngày</button></div>
@@ -272,11 +292,11 @@
 <div id="settingsModal" class="modal"><div class="sheet"><h3>Cài đặt & dữ liệu</h3><div class="form2"><input id="shopName" placeholder="Tên cơ sở"><input id="shopPhone" placeholder="SĐT/Zalo"><input id="bankName" placeholder="Ngân hàng"><input id="bankAcc" placeholder="Số tài khoản"><input id="bankOwner" class="wide" placeholder="Chủ tài khoản"><label class="btn secondary wide file">QR chuyển khoản<input id="qrFile" type="file" accept="image/*"></label></div><div class="sectionHead">Giá sạp</div><div class="form2"><input id="smallStallPrice" type="number" placeholder="Sạp bé"><input id="largeStallPrice" type="number" placeholder="Sạp to"></div><button class="btn primary full" style="margin-top:9px" onclick="saveSettings()">Lưu cài đặt</button><div class="sectionHead">Chuyển dữ liệu giữa máy</div><button class="btn secondary full" onclick="exportData()">⬆️ Xuất file dữ liệu</button><label class="btn secondary full file" style="display:block;text-align:center;margin-top:8px">⬇️ Nhập & gộp dữ liệu<input id="importFile" type="file" accept=".json,application/json" onchange="importData(this.files[0])"></label><button class="btn secondary full" style="margin-top:8px" onclick="exportCSV()">Xuất báo cáo CSV / Excel</button><button class="btn red full" style="margin-top:8px" onclick="restorePreImport()">↩ Khôi phục trước lần nhập gần nhất</button><button class="btn dark full" style="margin-top:9px" onclick="closeM('settingsModal')">Đóng</button></div></div>
 
 <script>
-const SEED={"settings": {"shopName": "THÁC DÊ CAMPING", "phone": "0906 068 198", "bank": "MB Bank", "account": "0123456789", "owner": "CHỦ TÀI KHOẢN", "qr": ""}, "stalls": [{"id": "s1", "name": "Sạp 01", "type": "big", "rent": 300000, "status": "empty", "order": {}}, {"id": "s2", "name": "Sạp 02", "type": "small", "rent": 200000, "status": "empty", "order": {}}, {"id": "s3", "name": "Sạp 03", "type": "big", "rent": 300000, "status": "empty", "order": {}}, {"id": "s4", "name": "Sạp 04", "type": "small", "rent": 200000, "status": "empty", "order": {}}], "products": [{"id": "p1", "name": "Gà nướng", "unit": "con", "price": 350000, "cost": 210000, "stock": 20, "icon": "🍗", "image": ""}, {"id": "p2", "name": "Cá rô nướng", "unit": "con", "price": 150000, "cost": 90000, "stock": 30, "icon": "🐟", "image": ""}, {"id": "p3", "name": "Chim nướng", "unit": "con", "price": 35000, "cost": 20000, "stock": 50, "icon": "🍖", "image": ""}, {"id": "p4", "name": "Tôm nướng", "unit": "con", "price": 15000, "cost": 9000, "stock": 100, "icon": "🦐", "image": ""}, {"id": "p5", "name": "Rau xào", "unit": "đĩa", "price": 50000, "cost": 28000, "stock": 40, "icon": "🥬", "image": ""}, {"id": "p6", "name": "Măng nứa xào", "unit": "đĩa", "price": 50000, "cost": 28000, "stock": 40, "icon": "🥘", "image": ""}, {"id": "p7", "name": "Hàu hấp", "unit": "kg", "price": 50000, "cost": 30000, "stock": 40, "icon": "🦪", "image": ""}], "bills": [], "purchases": [], "expenses": [], "preorders": [], "settlements": []}, KEY='BAITAM_POS_SPEC_V1';let currentReceiptBill=null;
+const SEED={"settings": {"shopName": "THÁC DÊ CAMPING", "phone": "0906 068 198", "bank": "MB Bank", "account": "0123456789", "owner": "CHỦ TÀI KHOẢN", "qr": ""}, "stalls": [{"id": "s1", "name": "Sạp 01", "type": "big", "rent": 300000, "status": "empty", "order": {}}, {"id": "s2", "name": "Sạp 02", "type": "small", "rent": 200000, "status": "empty", "order": {}}, {"id": "s3", "name": "Sạp 03", "type": "big", "rent": 300000, "status": "empty", "order": {}}, {"id": "s4", "name": "Sạp 04", "type": "small", "rent": 200000, "status": "empty", "order": {}}], "products": [{"id": "p1", "name": "Gà nướng", "unit": "con", "price": 350000, "icon": "🍗", "image": ""}, {"id": "p2", "name": "Cá rô nướng", "unit": "con", "price": 150000, "icon": "🐟", "image": ""}, {"id": "p3", "name": "Chim nướng", "unit": "con", "price": 35000, "icon": "🍖", "image": ""}, {"id": "p4", "name": "Tôm nướng", "unit": "con", "price": 15000, "icon": "🦐", "image": ""}, {"id": "p5", "name": "Rau xào", "unit": "đĩa", "price": 50000, "icon": "🥬", "image": ""}, {"id": "p6", "name": "Măng nứa xào", "unit": "đĩa", "price": 50000, "icon": "🥘", "image": ""}, {"id": "p7", "name": "Hàu hấp", "unit": "kg", "price": 50000, "icon": "🦪", "image": ""}], "bills": [], "purchases": [], "expenses": [], "preorders": [], "settlements": []}, KEY='BAITAM_POS_SPEC_V1';let currentReceiptBill=null;
 let pendingStallTypeAction=null;
 let db=JSON.parse(localStorage.getItem(KEY)||'null')||SEED,currentStall=null,filterProd='all',reportPeriod='day',editProduct=null,preItems={},expenseView='expense',kitchenStallId=null;
 db.investments=db.investments||[];db.repayments=db.repayments||[];db.products.forEach(p=>{p.unit=p.unit||'phần';p.price=+p.price||0;p.updatedAt=p.updatedAt||0;delete p.stock;delete p.cost;});
-db.purchases.forEach(x=>{if(!x.name)x.name=x.productName||'Mua hàng';if(!x.total)x.total=+x.amount||((+x.qty||0)*(+x.unitCost||0));x.buyFor=x.buyFor||'Dùng chung';x.contributors=x.contributors||[];x.updatedAt=x.updatedAt||0;});
+db.purchases.forEach(x=>{if(!x.name)x.name=x.productName||'Nguyên liệu';if(!x.total)x.total=+x.amount||((+x.qty||0)*(+x.unitCost||0));x.buyFor=x.buyFor||'Dùng chung';x.contributors=x.contributors||[];x.updatedAt=x.updatedAt||0;});
 
 if(!db.meta)db.meta={};
 if(!db.meta.brandMigratedToThacDe){
@@ -285,12 +305,12 @@ if(!db.meta.brandMigratedToThacDe){
   db.meta.brandMigratedToThacDe=true;
   localStorage.setItem(KEY,JSON.stringify(db));
 }
-db.meta=db.meta||{};db.meta.version=10;db.meta.smallStallPrice=db.meta.smallStallPrice||200000;db.meta.largeStallPrice=db.meta.largeStallPrice||300000;
+db.meta=db.meta||{};db.meta.version=11;db.meta.smallStallPrice=db.meta.smallStallPrice||200000;db.meta.largeStallPrice=db.meta.largeStallPrice||300000;
 db.stalls.forEach(s=>{s.baseName=s.baseName||s.name;s.order=s.order||{};s.order.items=s.order.items||{};if(s.rentEnabled===undefined)s.rentEnabled=true});
 db.bills.forEach(b=>{b.updatedAt=b.updatedAt||new Date((b.date||dateKey())+'T'+(b.time||'00:00')).getTime()||0});
 
 // ===== V6 KITCHEN / SERVING MIGRATION =====
-db.meta=db.meta||{};db.meta.version=10;
+db.meta=db.meta||{};db.meta.version=11;
 db.stalls.forEach(s=>{
   s.order=s.order||{};s.order.items=s.order.items||{};s.order.kitchen=s.order.kitchen||{};
   Object.entries(s.order.items).forEach(([pid,q])=>{
@@ -300,6 +320,23 @@ db.stalls.forEach(s=>{
     else if(!['pending','cooking','served'].includes(k.status))k.status='pending';
   });
 });
+
+
+// ===== V12 FINANCE LEDGER MIGRATION =====
+db.meta=db.meta||{};db.meta.version=12;
+db.cashLedger=db.cashLedger||[];
+db.people=db.people||[];
+function personNames(){
+  const s=new Set();
+  (db.people||[]).forEach(x=>x&&s.add(x));
+  (db.purchases||[]).forEach(x=>(x.contributors||[]).forEach(c=>c.person&&s.add(c.person)));
+  (db.expenses||[]).forEach(x=>x.payer&&s.add(x.payer));
+  (db.investments||[]).forEach(x=>x.payer&&s.add(x.payer));
+  (db.repayments||[]).forEach(x=>x.person&&s.add(x.person));
+  (db.cashLedger||[]).forEach(x=>x.person&&s.add(x.person));
+  return [...s].filter(Boolean).sort((a,b)=>a.localeCompare(b,'vi'));
+}
+function rememberPerson(name){name=(name||'').trim();if(!name)return;db.people=db.people||[];if(!db.people.includes(name))db.people.push(name)}
 
 const $=id=>document.getElementById(id),money=n=>(+n||0).toLocaleString('vi-VN')+' ₫',save=()=>localStorage.setItem(KEY,JSON.stringify(db)),uid=p=>p+'_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),prod=id=>db.products.find(x=>x.id===id),stall=id=>db.stalls.find(x=>x.id===id);
 function dateKey(d=new Date()){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
@@ -364,43 +401,18 @@ function applyRentChoice(){let c=$('rentChoice').value;$('rentAmount').value=c==
 
 
 // ===== V7 CLEAN MIGRATION =====
-db.meta=db.meta||{};db.meta.version=10;db.meta.appName='Thác Dê Camping';
+db.meta=db.meta||{};db.meta.version=11;db.meta.appName='Thác Dê Camping';
 
-// ===== V8.1 PER-UNIT SERVING MIGRATION =====
-db.meta=db.meta||{};db.meta.version=10;
-db.stalls.forEach(s=>{
-  s.order=s.order||{};s.order.items=s.order.items||{};s.order.kitchen=s.order.kitchen||{};
-  Object.entries(s.order.items).forEach(([pid,q])=>{
-    const qty=Math.max(0,+q||0);
-    let k=s.order.kitchen[pid]||(s.order.kitchen[pid]={status:'pending',served:0,units:[]});
-    if(!Array.isArray(k.units))k.units=[];
-    while(k.units.length<qty)k.units.push(false);
-    if(k.units.length>qty)k.units=k.units.slice(0,qty);
-    const oldServed=Math.max(0,Math.min(qty,+k.served||0));
-    // migrate previous aggregate served count into first N checked units if units are still empty
-    if(!k.units.some(Boolean) && oldServed>0){
-      for(let i=0;i<oldServed;i++)k.units[i]=true;
-    }
-    k.served=k.units.filter(Boolean).length;
-    k.status=k.served>=qty&&qty>0?'served':k.served>0?'cooking':'pending';
-  });
-});
+// ===== V11 KITCHEN STATE MIGRATION =====
+db.meta=db.meta||{};db.meta.version=11;
+db.stalls.forEach(s=>{s.baseName=s.baseName||s.name;s.order=s.order||{};s.order.items=s.order.items||{};s.order.kitchen=s.order.kitchen||{};Object.entries(s.order.items).forEach(([pid,q])=>{const qty=Math.max(0,+q||0);let k=s.order.kitchen[pid]||(s.order.kitchen[pid]={status:'pending',served:0});if(!Array.isArray(k.units)){const old=Math.max(0,Math.min(qty,+k.served||0));k.units=Array(qty).fill(false);for(let i=0;i<old;i++)k.units[i]=true}else{k.units=k.units.slice(0,qty);while(k.units.length<qty)k.units.push(false)}k.unitsInitialized=true;k.served=k.units.filter(Boolean).length;k.status=k.served>=qty&&qty>0?'served':k.served>0?'cooking':'pending'})});
 
-function kitchenTab(b){document.querySelectorAll('#kitchen .tabs button').forEach(x=>x.classList.remove('on'));b.classList.add('on')}
+
 function getKitchenState(s,pid){
-  s.order=s.order||{};s.order.items=s.order.items||{};s.order.kitchen=s.order.kitchen||{};
-  const q=Math.max(0,+(s.order.items?.[pid]||0));
-  let k=s.order.kitchen[pid]||(s.order.kitchen[pid]={status:'pending',served:0,units:[]});
-  if(!Array.isArray(k.units))k.units=[];
-  while(k.units.length<q)k.units.push(false);
-  if(k.units.length>q)k.units=k.units.slice(0,q);
-  if(!k.units.some(Boolean) && (+k.served||0)>0){
-    const n=Math.min(q,+k.served||0);
-    for(let i=0;i<n;i++)k.units[i]=true;
-  }
-  k.served=k.units.filter(Boolean).length;
-  k.status=k.served>=q&&q>0?'served':k.served>0?'cooking':'pending';
-  return k;
+  s.order=s.order||{};s.order.items=s.order.items||{};s.order.kitchen=s.order.kitchen||{};const q=Math.max(0,+(s.order.items?.[pid]||0));
+  let k=s.order.kitchen[pid]||(s.order.kitchen[pid]={status:'pending',served:0,units:Array(q).fill(false),unitsInitialized:true});
+  if(!Array.isArray(k.units)){const old=Math.max(0,Math.min(q,+k.served||0));k.units=Array(q).fill(false);for(let i=0;i<old;i++)k.units[i]=true}
+  k.units=k.units.slice(0,q);while(k.units.length<q)k.units.push(false);k.unitsInitialized=true;k.served=k.units.filter(Boolean).length;k.status=k.served>=q&&q>0?'served':k.served>0?'cooking':'pending';return k;
 }
 function unfinishedForStall(s){
   let n=0;
@@ -455,52 +467,11 @@ function closeKitchenStall(){
 }
 
 function renderKitchenDetail(){
-  const s=stall(kitchenStallId);
-  if(!s||!Object.keys(s.order?.items||{}).length){closeKitchenStall();return}
-
-  let total=0,served=0;
-  Object.entries(s.order.items||{}).forEach(([pid,q])=>{let k=getKitchenState(s,pid);total+=+q||0;served+=k.served||0});
-
-  $('kitchenDetailHead').innerHTML=
-    `<div class="titlebar">
-      <div>
-        <div class="title">${s.name}${s.order?.customer?' · '+s.order.customer:''}</div>
-        <div class="muted">${served>=total?'✅ Sạp này đã lên đủ món':'Đang phục vụ · còn thiếu '+Math.max(0,total-served)+' phần'}</div>
-      </div>
-      <button class="link" onclick="currentStall='${s.id}';openStall('${s.id}')">Mở bill</button>
-    </div>`;
-
-  $('kitchenSummary').innerHTML=
-    `<div class="kpi"><span>TỔNG</span><b>${total}</b></div>
-     <div class="kpi"><span>ĐÃ LÊN</span><b>${served}</b></div>
-     <div class="kpi"><span>CÒN THIẾU</span><b>${Math.max(0,total-served)}</b></div>
-     <div class="kpi"><span>TRẠNG THÁI</span><b>${served>=total?'✓ Đủ':'Đang lên'}</b></div>`;
-
-  $('kitchenList').innerHTML=Object.entries(s.order.items||{}).map(([pid,q])=>{
-    let p=prod(pid),k=getKitchenState(s,pid),pct=q?Math.min(100,k.served/q*100):0;
-    let cls=k.served>=q?'kServed':k.served>0?'kCooking':'kPending';
-    let txt=k.served>=q?'Đã đủ':k.served>0?'Đang lên':'Chưa lên';
-    const unitLabel=(p?.unit||'phần').toLowerCase();
-    const singular=unitLabel==='con'?'Con':unitLabel==='đĩa'?'Đĩa':unitLabel==='chai'?'Chai':unitLabel==='lon'?'Lon':'Phần';
-    const units=(k.units||[]).map((done,i)=>`<button class="unitChip ${done?'unitDone':''}" onclick="toggleKitchenUnit('${s.id}','${pid}',${i})">${done?'✓ ':''}${singular} ${i+1}</button>`).join('');
-
-    return `<div class="kitchenCard" style="margin-bottom:10px">
-      <div class="kitchenItem">
-        <div class="titlebar">
-          <div><b>${p?.name||'Món'} × ${q}</b><div class="muted">Đã lên ${k.served}/${q} ${p?.unit||'phần'}</div></div>
-          <span class="kStatus ${cls}">${txt}</span>
-        </div>
-        <div class="kProgress"><i style="width:${pct}%"></i></div>
-        <div class="unitGrid">${units}</div>
-        <div class="kActions">
-          <button class="btn secondary" onclick="markPreviousUnit('${s.id}','${pid}')">− 1</button>
-          <button class="btn primary" onclick="markNextUnit('${s.id}','${pid}')">+ Lên 1</button>
-          <button class="btn green" onclick="serveAll('${s.id}','${pid}')">✓ Lên đủ</button>
-        </div>
-        <button class="link" style="margin-top:7px" onclick="cancelKitchenItem('${s.id}','${pid}')">Hủy món</button>
-      </div>
-    </div>`;
-  }).join('');
+  const s=stall(kitchenStallId);if(!s||!Object.keys(s.order?.items||{}).length){closeKitchenStall();return}
+  let total=0,served=0;Object.entries(s.order.items||{}).forEach(([pid,q])=>{let k=getKitchenState(s,pid);total+=+q||0;served+=k.served||0});const missing=Math.max(0,total-served);
+  $('kitchenDetailHead').innerHTML=`<div class="titlebar"><div><div class="title">${s.name}${s.order?.customer?' · '+s.order.customer:''}</div><div class="muted">${missing===0?'✅ Đã lên đủ toàn bộ':'Còn '+missing+' phần chưa lên'}</div></div><button class="link" onclick="currentStall='${s.id}';openStall('${s.id}')">Mở bill</button></div><div class="kitchenMiniStats"><span>Đã lên <b>${served}/${total}</b></span><span>${missing===0?'Hoàn tất':'Đang phục vụ'}</span></div><div class="kProgress"><i style="width:${total?Math.min(100,served/total*100):0}%"></i></div>`;
+  $('kitchenSummary').innerHTML='';
+  $('kitchenList').innerHTML=Object.entries(s.order.items||{}).map(([pid,q])=>{let p=prod(pid),k=getKitchenState(s,pid),pct=q?Math.min(100,k.served/q*100):0;let cls=k.served>=q?'kServed':k.served>0?'kCooking':'kPending';let txt=k.served>=q?'Đã đủ':k.served>0?'Đang lên':'Chưa lên';const ul=(p?.unit||'phần').toLowerCase(),singular=ul==='con'?'Con':ul==='đĩa'?'Đĩa':ul==='chai'?'Chai':ul==='lon'?'Lon':'Phần';const units=k.units.map((done,i)=>`<button class="unitChip ${done?'unitDone':''}" onclick="toggleKitchenUnit('${s.id}','${pid}',${i})">${done?'✓ ':''}${singular} ${i+1}</button>`).join('');return `<div class="kitchenCard"><div class="kitchenItem"><div class="titlebar"><div><b>${p?.name||'Món'} × ${q}</b><div class="muted">Đã lên ${k.served}/${q} ${p?.unit||'phần'}</div></div><span class="kStatus ${cls}">${txt}</span></div><div class="kProgress"><i style="width:${pct}%"></i></div><div class="unitGrid">${units}</div><div class="kActions"><button class="btn secondary" ${k.served===0?'disabled':''} onclick="markPreviousUnit('${s.id}','${pid}')">↩ Hoàn tác 1</button><button class="btn primary" ${k.served>=q?'disabled':''} onclick="markNextUnit('${s.id}','${pid}')">+ Lên 1</button><button class="btn green" ${k.served>=q?'disabled':''} onclick="serveAll('${s.id}','${pid}')">✓ Lên đủ</button></div><button class="link dangerLink" onclick="cancelKitchenItem('${s.id}','${pid}')">Hủy món</button></div></div>`}).join('');
 }
 
 function refreshKitchenViews(sid){
@@ -529,12 +500,7 @@ function markPreviousUnit(sid,pid){
   getKitchenState(s,pid);save();refreshKitchenViews(sid);
 }
 
-function setKitchenStatus(sid,pid,status){
-  const s=stall(sid);if(!s)return;const k=getKitchenState(s,pid);
-  if(status==='served')k.units=k.units.map(()=>true);
-  if(status==='pending')k.units=k.units.map(()=>false);
-  getKitchenState(s,pid);save();refreshKitchenViews(sid);
-}
+
 function changeServed(sid,pid,d){return d>0?markNextUnit(sid,pid):markPreviousUnit(sid,pid)}
 function serveAll(sid,pid){
   const s=stall(sid);if(!s)return;const k=getKitchenState(s,pid);k.units=k.units.map(()=>true);getKitchenState(s,pid);save();refreshKitchenViews(sid);
@@ -580,61 +546,29 @@ function finalizeCheckout(){
  let rent=$('rentChoice').value==='none'?0:Math.max(0,+$('rentAmount').value||0),dis=Math.max(0,+$('discount').value||0),dep=Math.max(0,+$('depositOrder').value||0),rev=Math.max(0,t.sub+rent-dis),due=Math.max(0,rev-dep);
  let items=Object.entries(s.order.items).map(([id,q])=>{let p=prod(id);return{id:p.id,name:p.name,unit:p.unit,qty:q,price:p.price}});
  let b={id:uid('bill'),code:'HD'+String(Date.now()).slice(-7),date:day,time:new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}),stallId:s.id,stallName:s.name,customer:$('customerOrder').value.trim(),items,kitchenSnapshot:JSON.parse(JSON.stringify(s.order.kitchen||{})),subtotal:t.sub,rent,rentChoice:$('rentChoice').value,discount:dis,deposit:dep,revenue:rev,due,updatedAt:Date.now(),pay:$('pay').value,note:$('orderNote').value};
- db.bills.unshift(b);s.order={};s.status='empty';save();showReceipt(b);renderHome();
+ db.bills.unshift(b);s.order={items:{},kitchen:{}};s.status='empty';s.name=s.baseName||s.name;s.updatedAt=Date.now();save();showReceipt(b);renderHome();
 }
 function showReceipt(b){currentReceiptBill=b;let qr=db.settings.qr?`<div class="center"><img src="${db.settings.qr}" style="max-width:145px;border-radius:10px"><div class="muted">${db.settings.bank} · ${db.settings.account}<br>${db.settings.owner}</div></div>`:'';$('receipt').innerHTML=`<h2>THÁC DÊ CAMPING</h2><div class="center"><small>HÓA ĐƠN THANH TOÁN</small><br><b>${b.code}</b><br><small>${b.date} · ${b.time} · ${b.stallName}${b.customer?' · '+b.customer:''}</small></div><div class="dash"></div>${b.items.map(i=>`<div class="r"><span>${i.name} × ${i.qty}</span><b>${money(i.price*i.qty)}</b></div>`).join('')}<div class="dash"></div><div class="r"><span>Tiền món</span><span>${money(b.subtotal)}</span></div>${b.rent?`<div class="r"><span>Tiền sạp (${b.rentChoice==='large'?'Sạp to':b.rentChoice==='small'?'Sạp bé':''})</span><span>${money(b.rent)}</span></div>`:''}${b.discount?`<div class="r"><span>Giảm giá</span><span>-${money(b.discount)}</span></div>`:''}${b.deposit?`<div class="r"><span>Đã cọc</span><span>-${money(b.deposit)}</span></div>`:''}<div class="r total"><span>CÒN TRẢ</span><span>${money(b.due)}</span></div><div class="r"><span>Thanh toán</span><span>${b.pay}</span></div>${b.note?`<small>Ghi chú: ${b.note}</small>`:''}<div class="dash"></div>${qr}<div class="center"><small>Zalo/SĐT: ${db.settings.phone}<br>Cảm ơn quý khách!</small></div>`;$('receiptModal').style.display='flex'}
-function openStallManage(){renderStallManage();$('stallModal').style.display='flex'}function renderStallManage(){$('stallManage').innerHTML=db.stalls.map(s=>`<div class="row"><div><b>${s.name}</b><div class="muted">${s.type==='big'?'Sạp to':'Sạp bé'} · ${money(s.rent)}</div></div><div><button class="btn secondary" onclick="renameStall('${s.id}')">Tên</button> <button class="btn secondary" onclick="toggleType('${s.id}')">Chọn loại</button> <button class="btn red" onclick="deleteStall('${s.id}')">Xóa</button></div></div>`).join('')}
+let editingStallId=null,editingStallType='big';
+function openStallManage(){toggleInlineAddStall(false);closeInlineEditStall();renderStallManage();$('stallModal').style.display='flex'}
+function renderStallManage(){
+  $('stallManage').innerHTML=db.stalls.length?db.stalls.map(s=>`<div class="row"><div><b>${s.name}</b><div class="muted">${s.type==='big'?'Sạp to':'Sạp bé'} · ${money(s.rent)}</div></div><div><button class="btn secondary" onclick="openInlineEditStall('${s.id}')">Sửa</button> <button class="btn red" onclick="deleteStall('${s.id}')">Xóa</button></div></div>`).join(''):'<div class="center muted" style="padding:18px">Chưa có sạp</div>';
+}
 function toggleInlineAddStall(force){
-  const el=$('inlineAddStall');if(!el)return;
-  const show=force===undefined?(el.style.display==='none'):!!force;
-  el.style.display=show?'block':'none';
-  if(show){
-    $('inlineBigPrice').textContent=money(db.meta.largeStallPrice||300000);
-    $('inlineSmallPrice').textContent=money(db.meta.smallStallPrice||200000);
-  }
+  const el=$('inlineAddStall');if(!el)return;const show=force===undefined?el.style.display==='none':!!force;
+  el.style.display=show?'block':'none';if(show){closeInlineEditStall();$('inlineBigPrice').textContent=money(db.meta.largeStallPrice||300000);$('inlineSmallPrice').textContent=money(db.meta.smallStallPrice||200000)}
 }
 function quickAddStall(type){
-  const rent=type==='big'?(db.meta.largeStallPrice||300000):(db.meta.smallStallPrice||200000);
-  const used=new Set(db.stalls.map(s=>s.baseName||s.name));
-  let n=1,name='';
-  do{name='Sạp '+String(n).padStart(2,'0');n++}while(used.has(name));
-  db.stalls.push({id:uid('stall'),name,baseName:name,type,rent,status:'empty',order:{items:{},kitchen:{}},updatedAt:Date.now()});
-  save();toggleInlineAddStall(false);renderStallManage();renderHome();
+  const rent=type==='big'?(db.meta.largeStallPrice||300000):(db.meta.smallStallPrice||200000);const used=new Set(db.stalls.map(s=>s.baseName||s.name));let n=1,name='';do{name='Sạp '+String(n).padStart(2,'0');n++}while(used.has(name));
+  db.stalls.push({id:uid('stall'),name,baseName:name,type,rent,status:'empty',order:{items:{},kitchen:{}},updatedAt:Date.now()});save();toggleInlineAddStall(false);renderStallManage();renderHome();
 }
-
-function addStall(){pendingStallTypeAction={mode:'add'};openStallTypePicker('add')}function renameStall(id){let s=stall(id),n=prompt('Tên sạp / tên người đặt:',s.name);if(n){s.name=n.trim();save();renderStallManage();renderHome()}}function toggleType(id){pendingStallTypeAction={mode:'edit',id};openStallTypePicker('edit',id)}
-function openStallTypePicker(mode,id=null){
-  pendingStallTypeAction={mode,id};
-  $('stallTypeTitle').textContent=mode==='add'?'Chọn loại sạp mới':'Chọn loại sạp';
-  if($('bigStallPriceLabel'))$('bigStallPriceLabel').textContent=money(db.meta.largeStallPrice||300000);
-  if($('smallStallPriceLabel'))$('smallStallPriceLabel').textContent=money(db.meta.smallStallPrice||200000);
-  $('stallTypeModal').style.display='flex';
-}
-function chooseStallType(type){
-  const a=pendingStallTypeAction;
-  if(!a)return;
-  const rent=type==='big'?(db.meta.largeStallPrice||300000):(db.meta.smallStallPrice||200000);
-  if(a.mode==='add'){
-    let n=db.stalls.length+1;
-    db.stalls.push({id:uid('stall'),name:'Sạp '+String(n).padStart(2,'0'),type,rent,status:'empty',order:{}});
-  }else if(a.mode==='edit'){
-    let s=stall(a.id);
-    if(!s)return;
-    s.type=type;
-    s.rent=rent;
-    if(s.order&&!Object.keys(s.order.items||{}).length){
-      s.order.rentChoice=type==='big'?'large':'small';
-      s.order.rentAmount=rent;
-    }
-  }
-  pendingStallTypeAction=null;
-  save();
-  closeM('stallTypeModal');
-  renderStallManage();
-  renderHome();
-}
+function openInlineEditStall(id){const s=stall(id);if(!s)return;toggleInlineAddStall(false);editingStallId=id;editingStallType=s.type==='big'?'big':'small';$('editStallName').value=s.name;updateEditTypeButtons();$('inlineEditStall').style.display='block'}
+function setEditStallType(type){editingStallType=type;updateEditTypeButtons()}
+function updateEditTypeButtons(){$('editTypeBig').className='btn '+(editingStallType==='big'?'primary':'secondary');$('editTypeSmall').className='btn '+(editingStallType==='small'?'primary':'secondary')}
+function closeInlineEditStall(){editingStallId=null;const el=$('inlineEditStall');if(el)el.style.display='none'}
+function saveInlineStallEdit(){const s=stall(editingStallId);if(!s)return;const name=$('editStallName').value.trim();if(!name)return alert('Nhập tên sạp.');s.name=name;s.type=editingStallType;s.rent=s.type==='big'?(db.meta.largeStallPrice||300000):(db.meta.smallStallPrice||200000);s.updatedAt=Date.now();save();closeInlineEditStall();renderStallManage();renderHome()}
 function deleteStall(id){let s=stall(id);if(s.status!=='empty'||Object.keys(s.order?.items||{}).length)return alert('Sạp đang được đặt hoặc có bill, không thể xóa.');if(confirm('Xóa '+s.name+'?')){db.stalls=db.stalls.filter(x=>x.id!==id);save();renderStallManage();renderHome()}}
-function renderInventory(){renderProducts();$('purchaseList').innerHTML=db.purchases.length?db.purchases.slice(0,30).map(x=>`<div class="row"><div><b>${x.name||x.productName||'Mua hàng'}</b><div class="muted">${x.date} · ${x.buyFor||'Dùng chung'}${x.contributors?.length?' · '+x.contributors.map(c=>c.person).join(', '):''}</div></div><b>${money(x.total||x.amount)}</b></div>`).join(''):'<div class="center muted" style="padding:18px">Chưa có khoản mua hàng</div>'}function renderProducts(){$('prodList').innerHTML=db.products.map(p=>`<div class="prod"><div class="pic" ${p.image?`style="background-image:url('${p.image}');font-size:0"`:''}>${p.image?'':p.icon||'📦'}</div><div class="pbody"><div class="pname">${p.name}</div><div class="muted">${p.unit||'phần'}</div><div class="price">${money(p.price)}</div><button class="btn secondary full" onclick="openProduct('${p.id}')">Sửa</button></div></div>`).join('')}
+function renderInventory(){renderProducts();$('purchaseList').innerHTML=db.purchases.length?db.purchases.slice(0,30).map(x=>`<div class="row"><div><b>${x.name||x.productName||'Nguyên liệu'}</b><div class="muted">${x.date} · ${x.buyFor||'Dùng chung'}${x.contributors?.length?' · '+x.contributors.map(c=>c.person).join(', '):''}</div></div><b>${money(x.total||x.amount)}</b></div>`).join(''):'<div class="center muted" style="padding:18px">Chưa có nguyên liệu đã ghi</div>'}function renderProducts(){$('prodList').innerHTML=db.products.map(p=>`<div class="prod"><div class="pic" ${p.image?`style="background-image:url('${p.image}');font-size:0"`:''}>${p.image?'':p.icon||'📦'}</div><div class="pbody"><div class="pname">${p.name}</div><div class="muted">${p.unit||'phần'}</div><div class="price">${money(p.price)}</div><button class="btn secondary full" onclick="openProduct('${p.id}')">Sửa</button></div></div>`).join('')}
 function openProduct(id=null){editProduct=id;let p=id?prod(id):null;$('pn').value=p?.name||'';$('pu').value=p?.unit||'';$('pprice').value=p?.price||'';$('picon').value=p?.icon||'';$('pimage').value='';$('productModal').style.display='flex'}function fileData(file){return new Promise((res,rej)=>{if(!file)return res('');let r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file)})}async function saveProduct(){
  let name=$('pn').value.trim(),price=+$('pprice').value||0;
  if(!name||price<=0)return alert('Cần nhập tên sản phẩm và giá bán.');
@@ -674,9 +608,7 @@ function openExpense(){
   $('expenseModal').style.display='flex';
 }
 function addExpenseItem(name='',amount=''){
-  const d=document.createElement('div');d.className='form2 expenseItem';d.style.marginBottom='7px';
-  d.innerHTML=`<input class="ename" placeholder="Mua gì? VD gas, mắm, đá..." value="${name}"><input class="eamount" type="number" placeholder="Số tiền" value="${amount}" oninput="updateExpenseTotal()">`;
-  $('expenseItems').appendChild(d);updateExpenseTotal();
+  const d=document.createElement('div');d.className='expenseItem';d.innerHTML=`<div class="expenseLine"><input class="ename" placeholder="Mua gì? VD gas, mắm, đá..." value="${name}"><input class="eamount" type="number" placeholder="Số tiền" value="${amount}" oninput="updateExpenseTotal()"><button class="iconBtn dangerLink" onclick="this.closest('.expenseItem').remove();updateExpenseTotal()">✕</button></div>`;$('expenseItems').appendChild(d);updateExpenseTotal();
 }
 function updateExpenseTotal(){
   $('expenseItemsTotal').textContent=money([...document.querySelectorAll('.expenseItem .eamount')].reduce((a,x)=>a+(+x.value||0),0));
@@ -703,9 +635,43 @@ function deleteExpense(kind,id){if(!confirm('Xóa khoản này?'))return;let k=k
 /* V7 removed obsolete duplicate renderReport */
 function renderTimeline(){/* V10 obsolete: replaced by renderTimelineV54 */}
 function openMonth(m){let bs=db.bills.filter(b=>b.date.startsWith(m)),groups={};bs.forEach(b=>(groups[b.date]??=[]).push(b));$('dayTitle').textContent='Chi tiết '+m;$('dayBills').innerHTML=Object.keys(groups).sort().map(k=>{let rev=groups[k].reduce((a,b)=>a+b.revenue,0);return `<div class="row" onclick="openDay('${k}')"><div><b>${k}</b><div class="muted">${groups[k].length} bill</div></div><b>${money(rev)}</b></div>`}).join('');$('dayModal').style.display='flex'}function openDay(day){let bs=db.bills.filter(b=>b.date===day);$('dayTitle').textContent='Chi tiết '+day;$('dayBills').innerHTML=bs.length?bs.map(b=>`<div class="row" onclick='showReceipt(${JSON.stringify(b)})'><div><b>${b.stallName}${b.customer?' · '+b.customer:''}</b><div class="muted">${b.time} · ${b.code} · ${b.items.map(i=>i.name+' ×'+i.qty).join(', ')}</div></div><b>${money(b.revenue)}</b></div>`).join(''):'<div class="center muted" style="padding:18px">Không có bill</div>';$('dayModal').style.display='flex'}
-/* V7 removed obsolete duplicate openRecon */function profitShare(){let d=stats('day'),people=[...new Set([...db.purchases.filter(x=>x.date===dateKey()).flatMap(x=>x.contributors.map(c=>c.person)),...db.expenses.filter(x=>x.date===dateKey()&&x.payer).map(x=>x.payer)])];if(!people.length)return alert('Chưa có người để chia.');let each=d.profit/people.length;$('shareResult').innerHTML=people.map(p=>`<div class="row"><b>${p}</b><b>${money(each)}</b></div>`).join('')}
+
 
 function capitalLedger(){let p={};db.purchases.forEach(x=>x.contributors.forEach(c=>p[c.person]=(p[c.person]||0)+c.amount));db.expenses.forEach(x=>{if(x.payer)p[x.payer]=(p[x.payer]||0)+x.amount});db.repayments.forEach(x=>p[x.person]=(p[x.person]||0)-x.amount);return p}
+
+function cashTxnSigned(x){const a=+x.amount||0;if(x.type==='handed')return -Math.abs(a);if(x.type==='adjust')return a;return Math.abs(a)}
+function cashBalanceFor(person,untilDate=null){return (db.cashLedger||[]).filter(x=>x.person===person&&(!untilDate||x.date<=untilDate)).reduce((a,x)=>a+cashTxnSigned(x),0)}
+function allCashBalances(untilDate=null){const o={};personNames().forEach(p=>o[p]=cashBalanceFor(p,untilDate));return o}
+function openCashLedger(){renderCashLedger();$('cashLedgerModal').style.display='flex'}
+function renderCashLedger(){
+ const balances=Object.entries(allCashBalances()).filter(([,a])=>Math.abs(a)>0.001).sort((a,b)=>Math.abs(b[1])-Math.abs(a[1]));
+ $('cashLedgerSummary').innerHTML=balances.length?balances.map(([p,a])=>`<div class="personRow"><div class="titlebar"><div><b>${p}</b><div class="muted">Tiền đang cầm hiện tại</div></div><div class="settle ${a>=0?'positive':'negative'}">${money(a)}</div></div></div>`).join(''):'<div class="box center muted" style="padding:20px">Chưa ghi số dư tiền của ai</div>';
+ const typeLabel={opening:'Số dư đầu kỳ',received:'Nhận thêm',handed:'Đã giao lại',adjust:'Điều chỉnh'};
+ const rows=[...(db.cashLedger||[])].sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0)).slice(0,40);
+ $('cashLedgerList').innerHTML=rows.length?rows.map(x=>{const v=cashTxnSigned(x);return `<div class="row"><div style="flex:1"><b>${x.person}</b><div class="muted">${x.date} · ${typeLabel[x.type]||x.type}${x.note?' · '+x.note:''}</div></div><b class="${v>=0?'positive':'negative'}">${v>=0?'+':'−'}${money(Math.abs(v))}</b></div>`}).join(''):'<div class="center muted" style="padding:18px">Chưa có biến động</div>'
+}
+function openCashTxn(){$('cashTxnDate').value=dateKey();$('cashTxnPerson').value='';$('cashTxnType').value='received';$('cashTxnAmount').value='';$('cashTxnNote').value='';$('cashTxnModal').style.display='flex'}
+function saveCashTxn(){
+ const date=$('cashTxnDate').value||dateKey(),person=$('cashTxnPerson').value.trim(),type=$('cashTxnType').value;let amount=+$('cashTxnAmount').value||0;
+ if(!person)return alert('Nhập tên người.');if(type!=='adjust'&&amount<=0)return alert('Số tiền phải lớn hơn 0.');if(type==='adjust'&&amount===0)return alert('Nhập số tiền điều chỉnh. Có thể nhập số âm.');
+ rememberPerson(person);db.cashLedger.unshift({id:uid('cash'),date,person,type,amount,note:$('cashTxnNote').value.trim(),updatedAt:Date.now()});save();closeM('cashTxnModal');renderCashLedger()
+}
+function businessNumbersForDay(day){const r=rawDayData(day);return{revenue:r.revenue,purchases:r.purchaseCost,operating:r.operating,investment:r.investment,profit:r.revenue-r.purchaseCost-r.operating}}
+function advancesByPerson(untilDate){const o={};(db.purchases||[]).filter(x=>x.date<=untilDate).forEach(x=>(x.contributors||[]).forEach(c=>{if(c.person)o[c.person]=(o[c.person]||0)+(+c.amount||0)}));(db.expenses||[]).filter(x=>x.date<=untilDate).forEach(x=>{if(x.payer)o[x.payer]=(o[x.payer]||0)+(+x.amount||0)});return o}
+function repaymentsByPerson(untilDate){const o={};(db.repayments||[]).filter(x=>x.date<=untilDate).forEach(x=>{if(x.person)o[x.person]=(o[x.person]||0)+(+x.amount||0)});return o}
+function settlementRows(untilDate){
+ const adv=advancesByPerson(untilDate),rep=repaymentsByPerson(untilDate),cash=allCashBalances(untilDate),names=new Set([...Object.keys(adv),...Object.keys(rep),...Object.keys(cash)]);
+ return [...names].sort((a,b)=>a.localeCompare(b,'vi')).map(person=>{const advanced=adv[person]||0,repaid=rep[person]||0,holding=cash[person]||0,owed=Math.max(0,advanced-repaid),net=owed-holding;return{person,advanced,repaid,holding,owed,net}}).filter(x=>Math.abs(x.advanced)+Math.abs(x.repaid)+Math.abs(x.holding)>0)
+}
+function openSettlementCenter(){$('settlementDate').value=dateKey();renderSettlementCenter();$('settlementCenterModal').style.display='flex'}
+function renderSettlementCenter(){
+ const day=$('settlementDate').value||dateKey(),b=businessNumbersForDay(day),rows=settlementRows(day);
+ $('settlementCenterContent').innerHTML=`<div class="financeHero"><div class="small" style="color:#e8fff5">LỢI NHUẬN VỀ TAY · ${day}</div><div class="big">${money(b.profit)}</div><div class="small" style="color:#e8fff5">Doanh thu − Nguyên liệu − Chi phí vận hành</div></div>
+ <div class="financeGrid"><div class="financeCard"><div class="muted">Doanh thu</div><div class="value">${money(b.revenue)}</div></div><div class="financeCard"><div class="muted">Nguyên liệu</div><div class="value">${money(b.purchases)}</div></div><div class="financeCard"><div class="muted">Chi phí vận hành</div><div class="value">${money(b.operating)}</div></div><div class="financeCard"><div class="muted">Đầu tư (riêng)</div><div class="value">${money(b.investment)}</div></div></div>
+ <div class="section"><div class="title">Quyết toán theo người</div>${rows.length?rows.map(x=>`<div class="personRow"><div class="titlebar"><b>${x.person}</b><div class="settle ${x.net>0?'positive':x.net<0?'negative':'neutral'}">${x.net>0?'Cần trả '+money(x.net):x.net<0?'Cần giao lại '+money(Math.abs(x.net)):'Đã cân'}</div></div><div class="row"><span>Đã ứng hộ</span><b>${money(x.advanced)}</b></div><div class="row"><span>Đã được hoàn</span><b>${money(x.repaid)}</b></div><div class="row"><span>Còn được hoàn</span><b>${money(x.owed)}</b></div><div class="row"><span>Đang cầm tiền quỹ</span><b>${money(x.holding)}</b></div><div class="moneyEquation">${money(x.owed)} − ${money(x.holding)} = <b>${money(x.net)}</b><br><span class="muted">Dương: quỹ cần trả · Âm: đang cầm dư và cần giao lại</span></div></div>`).join(''):'<div class="box center muted" style="padding:20px">Chưa có dữ liệu người ứng / người giữ tiền</div>'}</div>`
+}
+function exportSettlementCSV(){const day=$('settlementDate').value||dateKey(),b=businessNumbersForDay(day),rows=settlementRows(day),csv=[['THÁC DÊ CAMPING - QUYẾT TOÁN',day],['Doanh thu',b.revenue],['Nguyên liệu',b.purchases],['Chi phí vận hành',b.operating],['Lợi nhuận về tay',b.profit],['Đầu tư (riêng)',b.investment],[],['Người','Đã ứng','Đã hoàn','Còn được hoàn','Đang cầm tiền','Cần trả(+)/Cần giao lại(-)'],...rows.map(x=>[x.person,x.advanced,x.repaid,x.owed,x.holding,x.net])];download('\ufeff'+csv.map(r=>r.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\n'),'ThacDe-QuyetToan-'+day+'.csv','text/csv;charset=utf-8')}
+
 function openDebts(){let p=capitalLedger();$('debtList').innerHTML=Object.keys(p).length?Object.entries(p).sort((a,b)=>b[1]-a[1]).map(([n,a])=>`<div class="row"><b>${n}</b><b>${money(a)}</b></div>`).join(''):'<div class="center muted" style="padding:18px">Chưa có công nợ</div>';$('repayDate').value=dateKey();$('repayPerson').value='';$('repayAmount').value='';$('repayNote').value='';$('debtsModal').style.display='flex'}
 function saveRepayment(){let person=$('repayPerson').value.trim(),amount=+$('repayAmount').value||0;if(!person||amount<=0)return alert('Nhập người nhận và số tiền hoàn.');db.repayments.unshift({id:uid('repay'),person,amount,date:$('repayDate').value||dateKey(),note:$('repayNote').value,updatedAt:Date.now()});save();openDebts()}
 function openSettings(){setTimeout(()=>{if($('smallStallPrice'))$('smallStallPrice').value=db.meta.smallStallPrice||200000;if($('largeStallPrice'))$('largeStallPrice').value=db.meta.largeStallPrice||300000},0);let s=db.settings;$('shopName').value=s.shopName;$('shopPhone').value=s.phone;$('bankName').value=s.bank;$('bankAcc').value=s.account;$('bankOwner').value=s.owner;$('settingsModal').style.display='flex'}async function saveSettings(){
@@ -713,7 +679,7 @@ function openSettings(){setTimeout(()=>{if($('smallStallPrice'))$('smallStallPri
  db.stalls.forEach(s=>{s.rent=s.type==='big'?(db.meta.largeStallPrice||300000):(db.meta.smallStallPrice||200000);s.updatedAt=Date.now()});
  let qr=await fileData($('qrFile').files[0]);Object.assign(db.settings,{shopName:$('shopName').value||'THÁC DÊ CAMPING',phone:$('shopPhone').value,bank:$('bankName').value,account:$('bankAcc').value,owner:$('bankOwner').value,qr:qr||db.settings.qr});save();renderHome();alert('Đã lưu.');
 }
-function download(c,n,t){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:t}));a.download=n;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}function exportData(){download(JSON.stringify(db,null,2),'ThacDe-Backup-'+dateKey()+'-'+new Date().toTimeString().slice(0,5).replace(':','')+'.json','application/json')}function mergeArr(local,inc){let m=new Map(local.map(x=>[x.id,x]));inc.forEach(x=>{let old=m.get(x.id);if(!old||(x.updatedAt||0)>=(old.updatedAt||0))m.set(x.id,x)});return [...m.values()]}async function importData(file){if(!file)return;try{let backup=JSON.stringify(db);localStorage.setItem(KEY+'_PRE_IMPORT_BACKUP',backup);let inc=JSON.parse(await file.text());['stalls','products','bills','purchases','expenses','investments','preorders','settlements','repayments'].forEach(k=>db[k]=mergeArr(db[k]||[],inc[k]||[]));if(inc.settings)db.settings={...db.settings,...inc.settings};if(inc.meta)db.meta={...db.meta,...inc.meta};save();alert('Đã gộp dữ liệu: ID trùng được ghi đè, ID mới được bổ sung.');location.reload()}catch(e){alert('File dữ liệu không hợp lệ.')}}
+function download(c,n,t){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:t}));a.download=n;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}function exportData(){download(JSON.stringify(db,null,2),'ThacDe-Backup-'+dateKey()+'-'+new Date().toTimeString().slice(0,5).replace(':','')+'.json','application/json')}function mergeArr(local,inc){let m=new Map(local.map(x=>[x.id,x]));inc.forEach(x=>{let old=m.get(x.id);if(!old||(x.updatedAt||0)>=(old.updatedAt||0))m.set(x.id,x)});return [...m.values()]}async function importData(file){if(!file)return;try{let backup=JSON.stringify(db);localStorage.setItem(KEY+'_PRE_IMPORT_BACKUP',backup);let inc=JSON.parse(await file.text());['stalls','products','bills','purchases','expenses','investments','preorders','settlements','repayments','cashLedger'].forEach(k=>db[k]=mergeArr(db[k]||[],inc[k]||[]));if(inc.settings)db.settings={...db.settings,...inc.settings};if(inc.meta)db.meta={...db.meta,...inc.meta};if(Array.isArray(inc.people))db.people=[...new Set([...(db.people||[]),...inc.people])];save();alert('Đã gộp dữ liệu: ID trùng được ghi đè, ID mới được bổ sung.');location.reload()}catch(e){alert('File dữ liệu không hợp lệ.')}}
 function restorePreImport(){let x=localStorage.getItem(KEY+'_PRE_IMPORT_BACKUP');if(!x)return alert('Chưa có bản sao trước khi nhập.');if(confirm('Khôi phục dữ liệu trước lần nhập gần nhất?')){localStorage.setItem(KEY,x);location.reload()}}function exportCSV(){let rows=[['Mã bill','Ngày','Giờ','Sạp','Khách','Doanh thu','Cọc','Còn trả','Thanh toán']];db.bills.forEach(b=>rows.push([b.code,b.date,b.time,b.stallName,b.customer||'',b.revenue,b.deposit,b.due,b.pay]));download('\ufeff'+rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(',')).join('\n'),'bao-cao-'+dateKey()+'.csv','text/csv')}
 
 function openPre(){preItems={};$('preCustomer').value='';$('prePhone').value='';$('preDate').value=dateKey();$('preStart').value='09:00';$('preEnd').value='14:00';$('preDeposit').value='';$('preNote').value='';$('preStalls').innerHTML=db.stalls.map(s=>`<label class="row"><span><b>${s.name}</b><div class="muted">${s.type==='big'?'Sạp to':'Sạp bé'}</div></span><input class="preStallCheck" type="checkbox" value="${s.id}" style="width:auto"></label>`).join('');$('preProducts').innerHTML=db.products.map(p=>`<div class="row"><span>${p.name}</span><input style="width:90px" type="number" min="0" value="0" oninput="preItems['${p.id}']=+this.value||0"></div>`).join('');$('preModal').style.display='flex'}
@@ -729,7 +695,7 @@ function savePreV5(){
 function renderPreorders(){let a=[...db.preorders].sort((x,y)=>(x.date+(x.start||x.time||'')).localeCompare(y.date+(y.start||y.time||'')));$('preList').innerHTML=a.length?a.map(p=>`<div class="box precard" style="margin-bottom:9px"><div class="row"><div><b>${p.customer}</b><div class="muted">${p.date} · ${p.start||p.time||''}${p.end?'–'+p.end:''} · ${(p.stallNames||[p.stallName]).join(', ')}</div><div class="muted">${p.phone||''}${p.deposit?' · Cọc '+money(p.deposit):''}</div></div><span class="tag ${p.status==='reserved'?'reserved':'empty'}">${p.status==='reserved'?'Đã đặt':p.status}</span></div>${p.status==='reserved'?`<div class="actions" style="padding:8px"><button class="btn secondary" onclick="cancelPre('${p.id}')">Hủy</button><button class="btn primary" onclick="startPreV5('${p.id}')">Khách đã đến</button></div>`:''}</div>`).join(''):'<div class="box center muted" style="padding:20px">Chưa có đặt trước</div>'}
 function cancelPre(id){let p=db.preorders.find(x=>x.id===id);if(!p)return;p.status='cancelled';p.updatedAt=Date.now();save();renderPreorders();renderHome()}
 function startPreV5(id){let p=db.preorders.find(x=>x.id===id),ids=p.stallIds||[p.stallId];p.status='arrived';ids.forEach((id,i)=>{let s=stall(id);if(!s)return;s.status='using';s.order=s.order||{items:{}};s.order.items=s.order.items||{};s.order.customer=p.customer;s.order.deposit=i===0?p.deposit:0;s.order.preorderId=p.id;Object.entries(p.items||{}).forEach(([pid,q])=>{if(q>0&&i===0){s.order.items[pid]=(s.order.items[pid]||0)+q;s.order.kitchen=s.order.kitchen||{};s.order.kitchen[pid]=s.order.kitchen[pid]||{status:'pending',served:0,units:Array(q).fill(false)}}})});save();closeM('preModal');openStall(ids[0])}
-/* V7 removed obsolete duplicate openRecon */
+
 
 
 
@@ -817,7 +783,7 @@ function renderBusinessChart(rows){
   const max=Math.max(1,...rows.flatMap(x=>[x.revenue,x.purchaseCost,x.operating,Math.max(0,x.profit)]));
   el.innerHTML=`<div class="chartLegend">
     <span><i class="legendDot cRev"></i>Doanh thu</span>
-    <span><i class="legendDot cBuy"></i>Mua hàng</span>
+    <span><i class="legendDot cBuy"></i>Nguyên liệu</span>
     <span><i class="legendDot cExp"></i>Chi phí</span>
     <span><i class="legendDot cProfit"></i>Lợi nhuận</span>
   </div><div class="chartRows">${rows.slice(-31).map(x=>`<div class="chartCol" onclick="openDaySettlement('${x.day}')">
@@ -882,7 +848,7 @@ function renderDaySettlement(day){
       ${Object.keys(contrib||{}).length?Object.entries(contrib).map(([p,a])=>`<div class="rrow"><span>${p}</span><b>${money(a)}</b></div>`).join(''):'<div class="muted">Không có khoản ứng được ghi nhận</div>'}
     </div>
     <div class="settleSection"><h4>MUA HÀNG</h4>
-      ${purchases.length?purchases.map(x=>`<div class="rrow"><span>${x.name||x.productName||'Mua hàng'}${x.buyFor?' · '+x.buyFor:''}</span><b>${money(x.total||x.amount)}</b></div>`).join(''):'<div class="muted">Không có</div>'}
+      ${purchases.length?purchases.map(x=>`<div class="rrow"><span>${x.name||x.productName||'Nguyên liệu'}${x.buyFor?' · '+x.buyFor:''}</span><b>${money(x.total||x.amount)}</b></div>`).join(''):'<div class="muted">Không có</div>'}
     </div>
     <div class="settleSection"><h4>CHI PHÍ VẬN HÀNH</h4>
       ${expenses.length?expenses.map(x=>`<div class="rrow"><span>${x.name}${x.payer?' · '+x.payer+' trả':''}</span><b>${money(x.amount)}</b></div>`).join(''):'<div class="muted">Không có</div>'}
@@ -892,7 +858,7 @@ function confirmCloseDay(){
   const day=$('settleDate').value||dateKey(), old=getSettlement(day);
   if(old)return alert('Ngày này đã chốt.');
   const r=rawDayData(day);
-  if(!confirm(`Xác nhận chốt ${day}?\n\nDoanh thu: ${money(r.revenue)}\nMua hàng: ${money(r.purchaseCost)}\nChi phí: ${money(r.operating)}\nLợi nhuận về tay: ${money(r.profit)}\n\nSau khi chốt, báo cáo ngày này sẽ giữ theo snapshot cho đến khi bạn mở lại.`))return;
+  if(!confirm(`Xác nhận chốt ${day}?\n\nDoanh thu: ${money(r.revenue)}\nNguyên liệu: ${money(r.purchaseCost)}\nChi phí: ${money(r.operating)}\nLợi nhuận về tay: ${money(r.profit)}\n\nSau khi chốt, báo cáo ngày này sẽ giữ theo snapshot cho đến khi bạn mở lại.`))return;
   db.settlements=db.settlements.filter(x=>!(x.date===day&&x.status==='closed'));
   db.settlements.push({
     id:'settle_'+day,date:day,status:'closed',closedAt:Date.now(),updatedAt:Date.now(),
@@ -914,10 +880,10 @@ function saveDayReportPDF(){document.body.classList.add('print-day');setTimeout(
 window.addEventListener('afterprint',()=>document.body.classList.remove('print-day'));
 function exportDayCSV(){
  const day=$('settleDate').value||dateKey(),closed=getSettlement(day),raw=rawDayData(day),n=closed?.snapshot||{revenue:raw.revenue,purchaseCost:raw.purchaseCost,operating:raw.operating,investment:raw.investment,profit:raw.profit},contributors=closed?.contributors||raw.contributors,purchases=closed?.purchaseDetails||raw.purchases,expenses=closed?.expenseDetails||raw.expenses;
- const rows=[['THÁC DÊ CAMPING - CHỐT NGÀY',day],['Doanh thu',n.revenue],['Nguyên liệu / hàng bán',n.purchaseCost],['Chi phí vận hành',n.operating],['Lợi nhuận về tay',n.profit],['Đầu tư (riêng)',n.investment],[],['NGƯỜI ỨNG','SỐ TIỀN'],...Object.entries(contributors),[],['NGUYÊN LIỆU / HÀNG BÁN','GẮN VỚI','SỐ TIỀN','NGƯỜI TRẢ'],...purchases.map(x=>[x.name||'Mua hàng',x.buyFor||'Dùng chung',x.total||x.amount,(x.contributors||[]).map(c=>c.person+': '+c.amount).join(' | ')]),[],['CHI PHÍ','LOẠI','SỐ TIỀN','NGƯỜI TRẢ'],...expenses.map(x=>[x.name,x.category||'',x.amount,x.payer||''])];
+ const rows=[['THÁC DÊ CAMPING - CHỐT NGÀY',day],['Doanh thu',n.revenue],['Nguyên liệu / hàng bán',n.purchaseCost],['Chi phí vận hành',n.operating],['Lợi nhuận về tay',n.profit],['Đầu tư (riêng)',n.investment],[],['NGƯỜI ỨNG','SỐ TIỀN'],...Object.entries(contributors),[],['NGUYÊN LIỆU / HÀNG BÁN','GẮN VỚI','SỐ TIỀN','NGƯỜI TRẢ'],...purchases.map(x=>[x.name||'Nguyên liệu',x.buyFor||'Dùng chung',x.total||x.amount,(x.contributors||[]).map(c=>c.person+': '+c.amount).join(' | ')]),[],['CHI PHÍ','LOẠI','SỐ TIỀN','NGƯỜI TRẢ'],...expenses.map(x=>[x.name,x.category||'',x.amount,x.payer||''])];
  download('\ufeff'+rows.map(row=>row.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\n'),'Thac-De-Camping-Chot-Ngay-'+day+'.csv','text/csv;charset=utf-8');
 }
-function openRecon(){openDaySettlement(dateKey())}
+
 
 
 function __v83SmokeTest(){

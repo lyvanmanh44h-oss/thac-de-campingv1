@@ -1,10 +1,9 @@
-THÁC DÊ CAMPING V10 STABLE QA
+THÁC DÊ CAMPING V12 — TÀI CHÍNH 5 LỚP
 
-Các sửa lỗi nền thêm ngoài V9:
-- Sạp to nhận đúng giá sạp to (type=big -> large).
-- Xóa logic giá vốn/tồn kho còn sót khỏi order/bill.
-- Đặt trước tương lai không khóa sạp hiện tại; Home chỉ hiển thị lịch sắp tới.
-- Đổi giá sạp trong Cài đặt cập nhật các sạp hiện có.
-- Ngày đã Chốt sẽ khóa tạo bill/nguyên liệu/chi phí/đầu tư cho tới khi Mở lại.
-- Snapshot Chốt ngày giữ cả chi tiết nguyên liệu/chi phí để lịch sử không đổi.
-- Import dữ liệu gộp cả cấu hình meta (giá sạp).
+1. Kinh doanh = Doanh thu - Nguyên liệu - Chi phí vận hành = Lợi nhuận về tay
+2. Đầu tư = theo dõi riêng
+3. Người ứng = tiền cá nhân chi hộ
+4. Sổ quỹ = tiền thực tế đang nằm ở từng người
+5. Quyết toán = Còn được hoàn - Tiền đang cầm
+
+Ví dụ: đã ứng 11.041.000, đang cầm 2.125.000 => quỹ còn phải trả 8.916.000.
